@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,12 +12,24 @@ namespace BackendApi.Api.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromForm] string username, [FromForm] string password)
+        // Login model to accept JSON input
+        public class LoginModel
         {
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            string username = model.Username;
+            string password = model.Password;
+            //System.Threading.Thread.Sleep(2000); // Simulate a delay for demonstration purposes
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                return BadRequest(new { message = "Username and password are required" });
             // Replace with actual user validation
             if (username != "admin" || password != "password")
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid username or password" });
 
             var claims = new List<Claim>
         {
@@ -44,21 +56,21 @@ namespace BackendApi.Api.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = tokenHandler.WriteToken(token);
 
-            return Ok(new { jwt });
+            return Ok(new { token = jwt, message = "Login successful" });
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok();
+            return Ok(new { message = "Logout successful" });
         }
 
         [HttpGet("me")]
         public IActionResult Me()
         {
             if (User.Identity?.IsAuthenticated != true)
-                return Unauthorized();
+                return Unauthorized(new { message = "Not authenticated" });
 
             return Ok(new
             {

@@ -11,7 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 using BackendApi.Api;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -58,6 +57,7 @@ builder.Services.AddAuthentication(options =>
     options.AccessDeniedPath = "/auth/denied";
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    //options.Cookie.SameSite = SameSiteMode.None; // Allow cross-site cookies for development
 })
 .AddJwtBearer(options =>
 {
@@ -71,6 +71,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add CORS services
+/*builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});*/
+
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
@@ -78,7 +91,7 @@ builder.Services.AddIdentityCore<ApplicationUser>()
 var app = builder.Build();
 
 //app.UseHealthChecks("/health");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
@@ -88,6 +101,9 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseExceptionHandler(options => {  });
+
+// Use CORS before authentication
+//app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -102,4 +118,3 @@ app.MapGroup("/identity").MapCustomIdentityApi<ApplicationUser>();
 //TestCases.Run();
 
 app.Run();
-
