@@ -1,0 +1,23 @@
+# General Code Style & Formatting
+- Follow the Airbnb Style Guide for code formatting.
+- Use lowercase with hyphens for React component file names (e.g., user-card.tsx, not UserCard.tsx).
+- Prefer named exports for components.
+
+# Project Structure & Architecture
+- Follow Remix React Router patterns and use the App routes.
+- Correctly determine when to use server vs. client functions in Remix.
+
+# Styling & UI
+- Use Tailwind CSS for styling.
+- Use Shadcn UI for components.
+
+# Data Fetching & Forms
+- Use Remix Loader for data fetching.
+- Use Remix Form for form handling.
+- Use Zod for validation.
+
+# State Management & Logic
+- Use React Context for state management.
+
+# Backend & Database
+- No direct database access and using REST API for database access.
