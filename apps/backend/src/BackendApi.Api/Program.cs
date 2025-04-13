@@ -5,10 +5,16 @@ using BackendApi.Infrastructure.Data;
 using BackendApi.Api.Extensions;
 using NSwag;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using BackendApi.Api;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
 
 builder.Services.AddOpenApiDocument(options => {
     options.PostProcess = document =>
@@ -36,9 +42,34 @@ builder.Services.AddOpenApiDocument(options => {
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication()
-    .AddBearerToken(IdentityConstants.BearerScheme);
+//builder.Services.AddAuthorization();
+//builder.Services.AddAuthentication()
+//.AddBearerToken(IdentityConstants.BearerScheme);
+
+// Configure both cookie and JWT auth
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/auth/login";
+    options.AccessDeniedPath = "/auth/denied";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
+.AddJwtBearer(options =>
+{
+    var key = Encoding.UTF8.GetBytes("FGwuftblrSZdxWmCE!2=JlU7OdL7BJRMKdxPUGbNa-R-WBANhSgo4G=Yx=eGVnbz0fFw0bMd6-2bH6Mp1R?35P-b!HOtbVebxTQlbA/OL1jWZ85y?HukTSKblaUMmHfnBKat!a861Y1nXAvwHkZJ?UyLQbTcDMq/s7RnVL790ZP-f5A36qLj68kHXhn-w/v7LokJsWSZik8cMjO1rjba4Cf=GJqZ2e6XpWtyKcWt8Lemu7rj/Tqc4qJ8GVWCIF-g");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
 
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -56,7 +87,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler(options => { });
+//app.UseExceptionHandler(options => {  });
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
 
@@ -64,7 +99,7 @@ app.MapGroup("/identity").MapCustomIdentityApi<ApplicationUser>();
 
 //app.MapEndpoints();
 
-TestCases.Run();
+//TestCases.Run();
 
 app.Run();
 
