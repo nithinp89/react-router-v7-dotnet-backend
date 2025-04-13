@@ -17,17 +17,17 @@ builder.Services.AddOpenApiDocument(options => {
         {
             Version = "v1",
             Title = "Backend API",
-            Description = "NiyaX AI Powered OpenSource CRM",
-            TermsOfService = "https://github.com/nithinp89/niya-api#AGPL-3.0-1-ov-file",
+            Description = "Backend API Powered By Dotnet",
+            TermsOfService = "https://path-to-licence-file.com",
             Contact = new OpenApiContact
             {
-                Name = "Nithin Prathapan",
-                Url = "https://github.com/nithinp89/niya-api"
+                Name = "Your Name",
+                Url = "https://your-company.com"
             },
             License = new OpenApiLicense
             {
-                Name = "AGPL-3.0 license",
-                Url = "https://github.com/nithinp89/niya-api#AGPL-3.0-1-ov-file"
+                Name = "MIT License",
+                Url = "https://path-to-licence-file.com"
             }
         };
     };
