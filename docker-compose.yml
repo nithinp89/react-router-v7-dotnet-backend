@@ -1,0 +1,32 @@
+services:
+  app-frontend:
+    image: app-frontend
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+      - REDIS_HOST=redis://app-redis:6379
+    ports:
+      - "8080:8080" # host : container - Left open for debugging if needed in hostmachine
+    restart: unless-stopped
+
+  app-redis:
+    image: app-redis
+    build:
+      context: ./deploy/redis
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "6379" # Not mapped to host, only available internally
+
+  app-nginx:
+    image: app-nginx
+    build:
+      context: ./deploy/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # Expose nginx to host, use 443 for https
+    depends_on:
+      - niyax
+    restart: unless-stopped
