@@ -1,7 +1,7 @@
 import type { Route } from "./+types/login";
-import {
-    redirect,
-} from "react-router";
+import { redirect, useNavigate } from "react-router";
+import { useActionData, useNavigation, Form } from "react-router";
+import { useEffect, useState } from "react";
 //import { LoginForm } from "@/components/auth/login-form"
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
@@ -20,16 +20,105 @@ export async function loader({ }: Route.LoaderArgs)  {
   
 }
 
+export async function action({ request }: Route.ActionArgs) {
+  let formData = await request.formData();
+  let username = formData.get("username");
+  let password = formData.get("password");
+  
+  try {
+    console.log("Attempting to authenticate with credentials:", { username });
+    
+    // Make API call to backend authentication endpoint
+    const response = await fetch("http://localhost:52295/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username, // Using username field as expected by the backend
+        password: password
+      }),
+      credentials: "include", // This ensures cookies are sent and stored
+    });
+
+    console.log("Authentication response status:", response.status);
+
+    if (!response.ok) {
+      // Handle authentication failure
+      const errorText = await response.text();
+      console.error("Authentication failed:", errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        console.error("Return the error data without redirecting:", errorData.message);
+        return { error: errorData.message || "Authentication failed" };
+      } catch (e) {
+        return { error: errorText || "Authentication failed" };
+      }
+    }
+
+    // Get the JWT token from the response
+    const responseText = await response.text();
+    console.log("Authentication response:", responseText);
+    
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      console.error("Failed to parse response as JSON:", e);
+      data = {};
+    }
+    
+    // Create headers and forward the cookies
+    const headers = new Headers();
+    const cookies = response.headers.get("Set-Cookie");
+    if (cookies) {
+      headers.append("Set-Cookie", cookies);
+    }
+    
+    // If the API returns a JWT token in the response body, we'll handle it in the client
+    // by storing it in localStorage after redirect
+    if (data.token) {
+      return { success: true, token: data.token };
+    }
+    
+    // Redirect to home page after successful login
+    return redirect("/");
+    
+  } catch (error) {
+    console.error("Login error:", error);
+    return { error: "Failed to connect to authentication service" };
+  }
+}
+
 export default function LoginPage() {
   const className = '';
   const props = {};
+  const actionData = useActionData<typeof action>();
+  const navigate = useNavigate();
+  const navigation = useNavigation();
+  const [error, setError] = useState<string | null>(null);
+  const isNavigating = Boolean(navigation.state === "submitting");
+  
+  // Handle JWT token storage on the client side if it's returned in the response
+  useEffect(() => {
+    if (actionData?.success && actionData?.token) {
+      localStorage.setItem('authToken', actionData.token);
+      navigate("/");
+    }
+    
+    // Set error message if returned from action
+    if (actionData?.error) {
+      setError(actionData.error);
+    }
+  }, [actionData]);
+
   return(
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
       <div className={cn("flex flex-col gap-6 py-5", className)} {...props}>
       <Card className="overflow-hidden py-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+        <Form method="post" className="p-6 md:p-8" action="/auth/login">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -37,12 +126,21 @@ export default function LoginPage() {
                   Login to your Acme Inc account
                 </p>
               </div>
+              
+              {error && (
+                <div className="rounded-md bg-red-50 p-4 text-sm text-red-500">
+                  {error}
+                </div>
+              )}
+              
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Email</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="Email"
+                  defaultValue="admin" // Pre-fill with test credentials
                   required
                 />
               </div>
@@ -56,10 +154,16 @@ export default function LoginPage() {
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  defaultValue="password" // Pre-fill with test credentials
+                  required 
+                />
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={isNavigating}>
+                {isNavigating ? "Logging in..." : "Login"}
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -102,7 +206,7 @@ export default function LoginPage() {
                 </a>
               </div>
             </div>
-          </form>
+          </Form>
           <div className="relative hidden bg-muted md:block w-full h-full">
             <img
               src="https://placehold.co/400x500"
