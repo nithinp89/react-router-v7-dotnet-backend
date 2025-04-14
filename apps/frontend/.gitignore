@@ -5,5 +5,8 @@
 /.react-router/
 /build/
 
+# Logs
+/logs/
+
 # Environment
 .env
