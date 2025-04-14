@@ -15,25 +15,25 @@ namespace BackendApi.Api.Controllers
         // Login model to accept JSON input
         public class LoginModel
         {
-            public string Username { get; set; }
+            public string Email { get; set; }
             public string Password { get; set; }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            string username = model.Username;
+            string email = model.Email;
             string password = model.Password;
             //System.Threading.Thread.Sleep(2000); // Simulate a delay for demonstration purposes
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return BadRequest(new { message = "Username and password are required" });
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                return BadRequest(new { message = "Email and password are required" });
             // Replace with actual user validation
-            if (username != "admin" || password != "password")
-                return Unauthorized(new { message = "Invalid username or password" });
+            if (email != "admin" || password != "password")
+                return Unauthorized(new { message = "Invalid Email or password" });
 
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Name, email),
             new Claim(ClaimTypes.Role, "Admin"),
         };
 
@@ -41,7 +41,7 @@ namespace BackendApi.Api.Controllers
             var principal = new ClaimsPrincipal(identity);
 
             // Sign in with cookie
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             // Also issue JWT
             var tokenHandler = new JwtSecurityTokenHandler();

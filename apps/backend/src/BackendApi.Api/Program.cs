@@ -51,14 +51,14 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-{
-    options.LoginPath = "/auth/login";
-    options.AccessDeniedPath = "/auth/denied";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    //options.Cookie.SameSite = SameSiteMode.None; // Allow cross-site cookies for development
-})
+//.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+//{
+//    options.LoginPath = "/auth/login";
+//    options.AccessDeniedPath = "/auth/denied";
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//    //options.Cookie.SameSite = SameSiteMode.None; // Allow cross-site cookies for development
+//})
 .AddJwtBearer(options =>
 {
     var key = Encoding.UTF8.GetBytes("FGwuftblrSZdxWmCE!2=JlU7OdL7BJRMKdxPUGbNa-R-WBANhSgo4G=Yx=eGVnbz0fFw0bMd6-2bH6Mp1R?35P-b!HOtbVebxTQlbA/OL1jWZ85y?HukTSKblaUMmHfnBKat!a861Y1nXAvwHkZJ?UyLQbTcDMq/s7RnVL790ZP-f5A36qLj68kHXhn-w/v7LokJsWSZik8cMjO1rjba4Cf=GJqZ2e6XpWtyKcWt8Lemu7rj/Tqc4qJ8GVWCIF-g");
@@ -72,7 +72,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add CORS services
-/*builder.Services.AddCors(options =>
+builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", builder =>
     {
@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(options =>
             .AllowAnyHeader()
             .AllowCredentials();
     });
-});*/
+});
 
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -103,7 +103,7 @@ if (app.Environment.IsDevelopment())
 //app.UseExceptionHandler(options => {  });
 
 // Use CORS before authentication
-//app.UseCors("AllowFrontend");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
