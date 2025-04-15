@@ -6,8 +6,9 @@ export default [
 
     // Auth
     ...prefix("auth", [
-    layout("routes/auth/auth-layout.tsx", [
-        route("/login", "routes/auth/login.tsx"),
-    ]),]),
-
+        layout("routes/auth/auth-layout.tsx", [
+            route("/login", "routes/auth/login.tsx"),
+            route("/logout", "routes/auth/logout.tsx"),
+        ]),
+      ]),
 ] satisfies RouteConfig;

@@ -43,6 +43,7 @@ export function Welcome({ tenant }: { tenant: string }) {
                 <Link className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500" to="/dashboard">Dashboard</Link>
               </li>
               <li><Link className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500" to="/auth/login">Login</Link></li>
+              <li><Link className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500" to="/auth/logout">Logout</Link></li>
               <li><h3>{tenant}</h3></li>
             </ul>
           </nav>
