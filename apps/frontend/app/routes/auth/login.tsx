@@ -1,6 +1,6 @@
 import { Form, useActionData, redirect, useNavigation } from "react-router";
 import { authenticator } from "~/services/auth/authenticator.server";
-import { sessionStorage } from "~/services/auth/auth.server";
+import { sessionStorage, AuthService } from "~/services/auth/auth.server";
 import type { Route } from "./+types/login";
 import logger from "~/services/logger/logger.server";
 import { LoginForm } from "~/components/auth/login-form";
@@ -10,6 +10,20 @@ export function meta({ }: Route.MetaArgs) {
     { title: "Login" },
     { name: "description", content: "Login to App!" },
   ];
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  // Check if user is already authenticated
+  const isAuthenticated = await AuthService.isAuthenticated(request);
+  
+  // If authenticated, redirect to dashboard
+  if (isAuthenticated) {
+    logger.debug("User already authenticated, redirecting to dashboard");
+    return redirect("/dashboard");
+  }
+  
+  // Otherwise, continue to login page
+  return null;
 }
 
 export async function action({ request }: Route.ActionArgs) {
