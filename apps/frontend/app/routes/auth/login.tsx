@@ -4,7 +4,7 @@ import { sessionStorage, AuthService } from "~/services/auth/auth.server";
 import type { Route } from "./+types/login";
 import logger from "~/services/logger/logger.server";
 import { LoginForm } from "~/components/auth/login-form";
-
+import { ROUTE_DASHBOARD } from "~/constants";
 export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Login" },
@@ -15,13 +15,13 @@ export function meta({ }: Route.MetaArgs) {
 export async function loader({ request }: Route.LoaderArgs) {
   // Check if user is already authenticated
   const isAuthenticated = await AuthService.isAuthenticated(request);
-  
+
   // If authenticated, redirect to dashboard
   if (isAuthenticated) {
     logger.debug("User already authenticated, redirecting to dashboard");
-    return redirect("/dashboard");
+    return redirect(ROUTE_DASHBOARD);
   }
-  
+
   // Otherwise, continue to login page
   return null;
 }
@@ -40,7 +40,7 @@ export async function action({ request }: Route.ActionArgs) {
     session.set("user", user);
 
     // Redirect to the home page after successful login
-    return redirect("/dashboard", {
+    return redirect(ROUTE_DASHBOARD, {
       headers: {
         "Set-Cookie": await sessionStorage.commitSession(session),
       },
@@ -63,37 +63,9 @@ export default function LoginPage() {
   return (
 
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-          <div className="w-full max-w-sm md:max-w-3xl">
-            <LoginForm error={actionData?.error ?? null} isLoading={isLoading} />
-          </div>
-        </div>
-
-    // <div>
-    //   <h1>Login</h1>
-
-    //   {actionData?.error ? (
-    //     <div className="error">{actionData.error}</div>
-    //   ) : null}
-
-    //   <Form method="post">
-    //     <div>
-    //       <label htmlFor="email">Email</label>
-    //       <input type="text" name="email" id="email" required />
-    //     </div>
-
-    //     <div>
-    //       <label htmlFor="password">Password</label>
-    //       <input
-    //         type="password"
-    //         name="password"
-    //         id="password"
-    //         autoComplete="current-password"
-    //         required
-    //       />
-    //     </div>
-
-    //     <button type="submit">Sign In</button>
-    //   </Form>
-    // </div>
+      <div className="w-full max-w-sm md:max-w-3xl">
+        <LoginForm error={actionData?.error ?? null} isLoading={isLoading} />
+      </div>
+    </div>
   );
 }

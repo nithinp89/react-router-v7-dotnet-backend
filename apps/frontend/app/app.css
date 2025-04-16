@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.dark,
+:root[class~="dark"] {
+  
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -116,8 +121,8 @@ body {
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.208 0.042 265.755);
   --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: #021C3D;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: oklch(0.279 0.041 260.031);
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
@@ -128,8 +133,15 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* https://github.com/tailwindlabs/tailwindcss.com/pull/2023 */
+  button,
+  [role="button"] {
+    cursor: pointer;
   }
   
   /* Custom scrollbar styling for Webkit browsers */
@@ -137,11 +149,11 @@ body {
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background-color: var(--sidebar-accent);
     border-radius: 20px;

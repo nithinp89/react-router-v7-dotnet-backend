@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Link } from "react-router";
 import { ArchiveX, Command, File, Inbox, Send, Trash2 } from "lucide-react"
 
 import { NavUser } from "~/components/nav-user"
@@ -17,6 +18,7 @@ import {
   useSidebar,
 } from "~/components/ui/sidebar"
 import { Switch } from "~/components/ui/switch"
+import { ModeToggle } from "~/components/mode-toggle";
 
 // This is sample data
 const data = {
@@ -165,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="#">
+                <Link to="/">
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <Command className="size-4" />
                   </div>
@@ -173,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <span className="truncate font-medium">Acme Inc</span>
                     <span className="truncate text-xs">Enterprise</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -213,6 +215,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
+          <ModeToggle />
           <NavUser user={data.user} />
         </SidebarFooter>
       </Sidebar>
