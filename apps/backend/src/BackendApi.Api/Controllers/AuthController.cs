@@ -56,7 +56,7 @@ namespace BackendApi.Api.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = jwt, message = "Login successful" });
+            return Ok(new { jwt, email, id = "9b452c2f-261a-40cb-963d-00dfd67c524d\n\n" });
         }
 
         [HttpPost("logout")]
