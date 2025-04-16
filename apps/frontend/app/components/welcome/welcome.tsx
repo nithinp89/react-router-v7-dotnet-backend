@@ -1,8 +1,9 @@
 import { Link } from "react-router";
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
+import type { User } from "~/services/auth/types";
 
-export function Welcome({ tenant }: { tenant: string }) {
+export function Welcome({ tenant, user }: { tenant: string | null; user: User | null }) {
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
@@ -45,6 +46,8 @@ export function Welcome({ tenant }: { tenant: string }) {
               <li><Link className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500" to="/auth/login">Login</Link></li>
               <li><Link className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500" to="/auth/logout">Logout</Link></li>
               <li><h3>{tenant}</h3></li>
+              <li><h3>Email: {user?.email}</h3></li>
+              <li><h3>Token: {user?.jwt}</h3></li>
             </ul>
           </nav>
         </div>

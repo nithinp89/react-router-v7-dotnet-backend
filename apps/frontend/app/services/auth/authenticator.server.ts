@@ -28,7 +28,7 @@ authenticator.use(
             email: email,
             username_type: "email",
             password: password,
-        }).then(response => response.json());
+        });
     }),
     
     // each strategy has a name and can be changed to use the same strategy
