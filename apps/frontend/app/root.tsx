@@ -36,17 +36,17 @@ export const links: Route.LinksFunction = () => [
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUrl = new URL(request.url)
   const user = await AuthService.getCurrentUser(request);
-  
+
   if (currentUrl.pathname !== ROUTE_AUTH_LOGIN && currentUrl.pathname !== ROUTE_AUTH_LOGOUT && !user)
     return redirect(ROUTE_AUTH_LOGIN)
 
   const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
+    user,
   };
 }
 
-// Wrap your app with ThemeProvider.
 // `specifiedTheme` is the stored theme in the session storage.
 // `themeAction` is the action name that's used to change the theme in the session storage.
 export default function AppWithProviders() {
@@ -93,7 +93,7 @@ export function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <Outlet context={data.user} />
         <ScrollRestoration />
         <Scripts />
       </body>
