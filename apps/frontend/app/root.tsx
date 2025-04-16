@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  redirect,
 } from "react-router";
 import {
   ThemeProvider,
@@ -16,6 +17,8 @@ import { themeSessionResolver } from "~/utils/theme-sessions.server";
 import type { Route } from "./+types/root";
 import "./app.css";
 import clsx from "clsx";
+import { AuthService } from "./services/auth/auth.server";
+import { ROUTE_AUTH_LOGIN, ROUTE_AUTH_LOGOUT } from "./constants";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -31,7 +34,12 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  console.log(request);
+  const currentUrl = new URL(request.url)
+  const user = await AuthService.getCurrentUser(request);
+  
+  if (currentUrl.pathname !== ROUTE_AUTH_LOGIN && currentUrl.pathname !== ROUTE_AUTH_LOGOUT && !user)
+    return redirect(ROUTE_AUTH_LOGIN)
+
   const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
