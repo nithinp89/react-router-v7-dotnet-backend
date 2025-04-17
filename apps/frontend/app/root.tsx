@@ -15,10 +15,11 @@ import {
 } from "remix-themes";
 import { themeSessionResolver } from "~/utils/theme-sessions.server";
 import type { Route } from "./+types/root";
-import "./app.css";
 import clsx from "clsx";
 import { AuthService } from "./services/auth/auth.server";
-import { ROUTE_AUTH_LOGIN, ROUTE_AUTH_LOGOUT } from "./constants";
+import { Routes } from "./constants";
+import { Toaster } from "@/components/ui/sonner"
+import "./app.css";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -96,6 +97,7 @@ export function App() {
         <Outlet context={data.user} />
         <ScrollRestoration />
         <Scripts />
+        <Toaster position="top-center" expand={true} duration={5000} richColors  />
       </body>
     </html>
   );
