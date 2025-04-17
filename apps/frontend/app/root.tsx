@@ -8,6 +8,7 @@ import {
   useLoaderData,
   redirect,
 } from "react-router";
+import { useEffect } from "react";
 import {
   ThemeProvider,
   useTheme,
@@ -38,15 +39,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   const currentUrl = new URL(request.url)
   const user = await AuthService.getCurrentUser(request);
 
-  if (currentUrl.pathname !== ROUTE_AUTH_LOGIN && currentUrl.pathname !== ROUTE_AUTH_LOGOUT && !user)
-    return redirect(ROUTE_AUTH_LOGIN)
+  if (currentUrl.pathname !== Routes.AUTH_LOGIN && currentUrl.pathname !== Routes.AUTH_LOGOUT && !user)
+    return redirect(Routes.AUTH_LOGIN)
 
   const { getTheme } = await themeSessionResolver(request);
+
   return {
     theme: getTheme(),
     user,
   };
 }
+
 
 // `specifiedTheme` is the stored theme in the session storage.
 // `themeAction` is the action name that's used to change the theme in the session storage.
@@ -83,7 +86,7 @@ export default function AppWithProviders() {
 export function App() {
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
-  //return <Outlet />;
+
   return (
     <html lang="en" className={clsx(theme)}>
       <head>

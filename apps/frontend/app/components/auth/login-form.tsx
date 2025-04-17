@@ -8,7 +8,6 @@ import { Label } from '~/components/ui/label';
 import { cn } from '~/lib/utils';
 
 interface LoginFormProps {
-  error: string | null;
   isLoading?: boolean;
   className?: string;
 }
@@ -16,7 +15,7 @@ interface LoginFormProps {
 /**
  * Login form component
  */
-export function LoginForm({ error, isLoading = false, className = '' }: LoginFormProps) {
+export function LoginForm({ isLoading = false, className = '' }: LoginFormProps) {
   const navigation = useNavigation();
   // Use either the prop or the navigation state
   const isSubmitting = isLoading || Boolean(navigation.state === "submitting");
@@ -37,12 +36,6 @@ export function LoginForm({ error, isLoading = false, className = '' }: LoginFor
                   Login to your Acme Inc account
                 </p>
               </div>
-              
-              {error && (
-                <div className="rounded-md bg-red-50 p-4 text-sm text-red-500">
-                  {error}
-                </div>
-              )}
               
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

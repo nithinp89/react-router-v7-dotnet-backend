@@ -5,16 +5,16 @@ import jwt from "jsonwebtoken";
 import type { User } from "./types";
 import type { LoginRequest } from "./types";
 import type { AuthResponse } from "./types";
-import { API_BASE_URL, API_AUTH_LOGIN, API_AUTH_LOGOUT, ROUTE_AUTH_LOGIN } from "~/constants";
+import { BackendApi } from "~/constants";
 import { createCookieSessionStorage } from "react-router";
 import logger from "~/services/logger/logger.server";
 import { redirect } from "react-router";
-import { AUTH_JWT_KEY, AUTH_FAILED_MESSAGE, AUTH_INVALID_CREDENTIALS_MESSAGE, AUTH_FAILED_NO_USER_MESSAGE, AUTH_SUCCESS_MESSAGE, AUTH_SERVICE_UNAVAILABLE_MESSAGE, AUTH_NO_USER_JWT_MESSAGE, AUTH_JWT_NOT_VALID_YET_MESSAGE, AUTH_JWT_EXPIRED_MESSAGE, AUTH_JWT_ISSUED_IN_FUTURE_MESSAGE } from "~/constants";
+import { Auth } from "~/constants";
 
 // Create a session storage
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: AUTH_JWT_KEY,
+    name: Auth.JWT_KEY,
     httpOnly: true,
     path: "/",
     sameSite: "lax",
@@ -32,7 +32,7 @@ export const AuthService = {
  */
   async loginRequest(credentials: LoginRequest): Promise<User> {
     try {
-      const response = await fetch(`${API_BASE_URL}${API_AUTH_LOGIN}`, {
+      const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_LOGIN}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,22 +47,22 @@ export const AuthService = {
       if (!response.ok) {
         // Handle authentication failure
         const errorText = await response.text();
-        logger.info(AUTH_FAILED_MESSAGE, { errorText });
+        logger.info(Auth.FAILED, { errorText });
 
         if (response.status === 401) {
-          logger.warn(AUTH_INVALID_CREDENTIALS_MESSAGE, credentials.email);
-          throw new Error(AUTH_INVALID_CREDENTIALS_MESSAGE);
+          logger.warn(Auth.INVALID_CREDENTIALS, credentials.email);
+          throw new Error(Auth.INVALID_CREDENTIALS);
         }
 
-        throw new Error(AUTH_FAILED_MESSAGE);
+        throw new Error(Auth.FAILED);
       }
 
       const data = await response.json();
-      logger.debug(AUTH_SUCCESS_MESSAGE, { data });
+      logger.debug(Auth.SUCCESS, { data });
 
       if (!data.email || !data.jwt || !data.id) {
-        logger.error(AUTH_FAILED_NO_USER_MESSAGE, { data });
-        throw new Error(AUTH_FAILED_NO_USER_MESSAGE);
+        logger.error(Auth.FAILED_NO_USER, { data });
+        throw new Error(Auth.FAILED_NO_USER);
       }
 
       const user: User = { email: data.email, jwt: data.jwt, id: data.id };
@@ -70,12 +70,12 @@ export const AuthService = {
 
     } catch (error: any) {
       // Only catch and wrap errors that are NOT the explicit 401 error
-      if (error instanceof Error && error.message === AUTH_INVALID_CREDENTIALS_MESSAGE) {
+      if (error instanceof Error && error.message === Auth.INVALID_CREDENTIALS) {
         throw error; // Let 401 errors bubble up
       }
 
-      logger.error(AUTH_SERVICE_UNAVAILABLE_MESSAGE, { error });
-      throw new Error(AUTH_SERVICE_UNAVAILABLE_MESSAGE);
+      logger.error(Auth.SERVICE_UNAVAILABLE, { error });
+      throw new Error(Auth.SERVICE_UNAVAILABLE);
     }
   },
 
@@ -85,17 +85,17 @@ export const AuthService = {
    */
   async logout(request: Request): Promise<Response> {
     try {
-      await fetch(`${API_BASE_URL}${API_AUTH_LOGOUT}`, {
+      await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_LOGOUT}`, {
         method: 'POST',
         credentials: 'include',
       });
 
     } catch (error) {
-      logger.error(AUTH_SERVICE_UNAVAILABLE_MESSAGE, { error });
+      logger.error(Auth.SERVICE_UNAVAILABLE, { error });
     }
 
     let session = await sessionStorage.getSession(request.headers.get("cookie"));
-    return redirect(ROUTE_AUTH_LOGIN, {
+    return redirect(BackendApi.AUTH_LOGIN, {
       headers: { "Set-Cookie": await sessionStorage.destroySession(session) },
     });
   },
@@ -109,15 +109,15 @@ export const AuthService = {
       const user = await this.getCurrentUser(request);
 
       if (!user) {
-        throw new Error(AUTH_NO_USER_JWT_MESSAGE);
+        throw new Error(Auth.NO_USER_JWT);
       }
 
       return user;
     } catch (error) {
-      logger.info(AUTH_NO_USER_JWT_MESSAGE, { error });
+      logger.info(Auth.NO_USER_JWT, { error });
 
       let session = await sessionStorage.getSession(request.headers.get("cookie"));
-      return redirect(ROUTE_AUTH_LOGIN, {
+      return redirect(BackendApi.AUTH_LOGIN, {
         headers: { "Set-Cookie": await sessionStorage.destroySession(session) },
       });
     }
@@ -136,7 +136,7 @@ export const AuthService = {
       logger.debug("Current user:", { user });
 
       if (!user || !user.jwt) {
-        logger.debug(AUTH_NO_USER_JWT_MESSAGE, { user });
+        logger.debug(Auth.NO_USER_JWT, { user });
         return null;
       }
 
@@ -146,19 +146,19 @@ export const AuthService = {
       const now = Math.floor(Date.now() / 1000); // current time in seconds
 
       if (decoded.nbf && now < decoded.nbf) {
-        throw new Error(AUTH_JWT_NOT_VALID_YET_MESSAGE);
+        throw new Error(Auth.JWT_NOT_VALID_YET);
       }
       if (decoded.exp && now >= decoded.exp) {
-        throw new Error(AUTH_JWT_EXPIRED_MESSAGE);
+        throw new Error(Auth.JWT_EXPIRED);
       }
       if (decoded.iat && now < decoded.iat) {
-        throw new Error(AUTH_JWT_ISSUED_IN_FUTURE_MESSAGE);
+        throw new Error(Auth.JWT_ISSUED_IN_FUTURE);
       }
 
       return { ...user, decodedJwt: decoded };
 
     } catch (error) {
-      logger.warn(AUTH_NO_USER_JWT_MESSAGE, { error });
+      logger.warn(Auth.NO_USER_JWT, { error });
 
       return null;
     }
