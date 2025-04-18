@@ -50,7 +50,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' 
+          dotnet-version: '8.0.x'
+
+      # Restore and Build Backend
       - name: Restore backend dependencies
         run: dotnet restore ./apps/backend/
       - name: Build backend
@@ -66,9 +68,9 @@ jobs:
         run: npm install
         working-directory: ./apps/frontend/
 
-      # Optionally, build the frontend (uncomment if you want to run a build)
+      # Build the frontend
       - name: Build frontend
-        run: react-router build
+        run: npm run build
         working-directory: ./apps/frontend/
 
       # Analyze with SonarCloud
