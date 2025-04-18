@@ -43,8 +43,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Analyze with SonarCloud
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      # Setup .NET for backend
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' 
+      - name: Restore backend dependencies
+        run: dotnet restore ./apps/backend/
+      - name: Build backend
+        run: dotnet build ./apps/backend/ --no-incremental
+
+      # Setup Node for frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./apps/frontend/
+
+      # Optionally, build the frontend (uncomment if you want to run a build)
+      - name: Build frontend
+        run: react-router build
+        working-directory: ./apps/frontend/
+
+      # Analyze with SonarCloud
+      - name: Analyze with SonarCloud
         # You can pin the exact commit or the version.
         # uses: SonarSource/sonarcloud-github-action@v2.2.0
         uses: SonarSource/sonarcloud-github-action@4006f663ecaf1f8093e8e4abb9227f6041f52216
