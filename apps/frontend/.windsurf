@@ -1,23 +1,40 @@
+# Project Structure & Architecture
+- Projects are split into Frontend and Backend apps. 
+- apps/frontend is the frontend app and using React Router v7
+- apps/backend is the backend app and using .NET 8.0
+
+# Frontend App
+- Follow Remix React Router patterns and use the App routes.
+- Correctly determine when to use server vs. client functions in Remix.
+- Use ".client" in the filename for client-side functions.
+- Use ".server" in the filename for server-side functions.
+- Client function cannot be called on Server side and vice versa.
+- Actions are organized in api folder using loader or action functions.
+- Client using Fetch to call API path which inturn exectuve Loader or Action functions.
+- No direct database access for the Frontend and using REST API to call the backend.
+- All backend calls has to be performed on the server side with jwt in the header
+- Frontend can directly access Redis to avoid API or Database calls
+
 # General Code Style & Formatting
 - Follow the Airbnb Style Guide for code formatting.
 - Use lowercase with hyphens for React component file names (e.g., user-card.tsx, not UserCard.tsx).
 - Prefer named exports for components.
-
-# Project Structure & Architecture
-- Follow Remix React Router patterns and use the App routes.
-- Correctly determine when to use server vs. client functions in Remix.
 
 # Styling & UI
 - Use Tailwind CSS for styling.
 - Use Shadcn UI for components.
 
 # Data Fetching & Forms
-- Use Remix Loader for data fetching.
-- Use Remix Form for form handling.
+- Use React Router v7 Loader for data fetching.
+- Use React Router v7 Form for form handling.
 - Use Zod for validation.
 
 # State Management & Logic
 - Use React Context for state management.
 
-# Backend & Database
-- No direct database access and using REST API for database access.
+# Backend
+- Backend connects to Database and Redis Cache
+- Authenitcation using jwt passed by Frontend
+- Backend responsible for authentication and issuing jwt
+- Microsoft identify is used in Asp .Net for authentication
+
