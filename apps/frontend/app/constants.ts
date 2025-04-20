@@ -12,7 +12,7 @@ export const APP_FAVICON = 'https://reactrouter.com/favicon.ico';
  * Theme
  */
 export enum Theme {
-  STORAGE_KEY = 'app-theme',
+  STORAGE_KEY = 'app_theme',
   COOKIE_SECRET = "5bd2624bd0464de478a45b8e36319e47fe2b600a4ffe80cad9d5c5e56911ca7b1b63e9c82452163d22ff52aedf0f847bc97c191da8ee5e15ca92d7a1bba1f606",
 }
 
@@ -35,16 +35,17 @@ export enum Routes {
  * AUTH
  */
 export enum Auth {
-  JWT_KEY = "__session",
+  SESSION_KEY = "__session",
   FAILED = "Authentication failed.",
-  FAILED_NO_USER = "No user or JWT retrived after login",
-  SERVICE_UNAVAILABLE = "Authentication Service Unavailable",
+  FAILED_NO_USER = "No user or JWT retrived after login.",
+  SERVICE_UNAVAILABLE = "Authentication Service Unavailable.",
   INVALID_CREDENTIALS = "Invalid Email or Password. Please try again.",
   SUCCESS = "Authentication successful.",
-  NO_USER_JWT = "No user found in session",
-  JWT_EXPIRED = "JWT has expired (exp claim)",
-  JWT_NOT_VALID_YET = "JWT not valid yet (nbf claim)",
-  JWT_ISSUED_IN_FUTURE = "JWT issued in the future (iat claim)",
+  NO_USER_JWT = "No user found in session.",
+  SESSION_INACTIVE = "Session is not active.",
+  JWT_EXPIRED = "JWT has expired (exp claim).",
+  JWT_NOT_VALID_YET = "JWT not valid yet (nbf claim).",
+  JWT_ISSUED_IN_FUTURE = "JWT issued in the future (iat claim).",
   EMPTY_USER_UUID = "00000000-0000-0000-0000-000000000000",
 }
 

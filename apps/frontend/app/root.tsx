@@ -37,10 +37,10 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader({ request }: Route.LoaderArgs) {
   const currentUrl = new URL(request.url)
-  const user = await AuthService.getCurrentUser(request);
+  const user = await AuthService.getCurrentUserOrRedirect(request);
 
-  if (currentUrl.pathname !== Routes.AUTH_LOGIN && currentUrl.pathname !== Routes.AUTH_LOGOUT && !user)
-    return redirect(Routes.AUTH_LOGIN)
+  if (currentUrl.pathname !== Routes.AUTH_LOGIN && currentUrl.pathname !== Routes.AUTH_LOGOUT && user instanceof Response)
+    return user;
 
   const { getTheme } = await themeSessionResolver(request);
 

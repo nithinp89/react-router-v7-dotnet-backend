@@ -9,12 +9,13 @@ import { BackendApi } from "~/constants";
 import { createCookieSessionStorage } from "react-router";
 import logger from "~/services/logger/logger.server";
 import { redirect } from "react-router";
-import { Auth } from "~/constants";
+import { Auth, Routes } from "~/constants";
+import { Console } from "console";
 
 // Create a session storage
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: Auth.JWT_KEY,
+    name: Auth.SESSION_KEY,
     httpOnly: true,
     path: "/",
     sameSite: "lax",
@@ -118,8 +119,8 @@ export const AuthService = {
       logger.info(Auth.NO_USER_JWT, { error });
 
       let session = await sessionStorage.getSession(request.headers.get("cookie"));
-      return redirect(BackendApi.AUTH_LOGIN, {
-        headers: { "Set-Cookie": await sessionStorage.destroySession(session) },
+      return redirect(Routes.AUTH_LOGIN, {
+        headers: { "Set-Cookie": await sessionStorage.destroySession(session) }
       });
     }
   },
@@ -158,9 +159,8 @@ export const AuthService = {
 
       return { ...user, decodedJwt: decoded };
 
-    } catch (error) {
-      logger.warn(Auth.NO_USER_JWT, { error });
-
+    } catch (error: any) {
+      logger.warn(Auth.SESSION_INACTIVE, error);
       return null;
     }
   },
