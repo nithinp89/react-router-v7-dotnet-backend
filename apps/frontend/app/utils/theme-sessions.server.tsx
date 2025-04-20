@@ -16,6 +16,8 @@ const sessionStorage = createCookieSessionStorage({
     ...(isProduction
       ? { domain: process.env.APP_DOMAIN, secure: true }
       : {}),
+    // Make cookie persist for 1 year
+    maxAge: 31536000,
   },
 })
 

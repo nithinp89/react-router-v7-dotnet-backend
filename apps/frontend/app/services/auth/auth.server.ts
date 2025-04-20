@@ -20,6 +20,7 @@ export const sessionStorage = createCookieSessionStorage({
     sameSite: "lax",
     secrets: ["s3cr3t90"], // replace this with an actual secret -- TODO
     secure: process.env.NODE_ENV === "production",
+    maxAge: 60*60*8, // 8 hours
   },
 });
 
