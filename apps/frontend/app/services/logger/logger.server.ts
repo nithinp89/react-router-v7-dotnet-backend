@@ -16,7 +16,11 @@ const fileRotateTransport = new (winston.transports as any).DailyRotateFile({
   maxFiles: '60d', // Keep logs for 60 days
   maxSize: '5m', // Maximum size of each log file
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
     winston.format.json()
   )
 });
