@@ -10,7 +10,6 @@ import { createCookieSessionStorage } from "react-router";
 import logger from "~/services/logger/logger.server";
 import { redirect } from "react-router";
 import { Auth, Routes } from "~/constants";
-import { Console } from "console";
 
 // Create a session storage
 export const sessionStorage = createCookieSessionStorage({
@@ -21,7 +20,7 @@ export const sessionStorage = createCookieSessionStorage({
     sameSite: "lax",
     secrets: ["s3cr3t90"], // replace this with an actual secret -- TODO
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60*60*8, // 8 hours
+    // DO NOT SET maxAge to keep active only until browser closes
   },
 });
 
@@ -39,8 +38,7 @@ export const AuthService = {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
-        credentials: 'include', // This ensures cookies are sent and stored
+        body: JSON.stringify(credentials)
       });
 
       logger.debug("Authentication response status:", { status: response.status });
@@ -67,7 +65,18 @@ export const AuthService = {
         throw new Error(Auth.FAILED_NO_USER);
       }
 
-      const user: User = { email: data.email, jwt: data.jwt, id: data.id };
+      const decoded: any = jwt.decode(data.jwt);
+      logger.debug("Decoded JWT payload:", decoded);
+
+      const user: User = { 
+        email: data.email, 
+        jwt: data.jwt, 
+        jwt_expiry: decoded.exp,
+        refresh_token: data.refresh_token,
+        refresh_token_expiry: data.refresh_token_expiry,
+        user_agent: credentials.user_agent,
+        id: data.id };
+
       return user;
 
     } catch (error: any) {
@@ -173,4 +182,78 @@ export const AuthService = {
     const user = await this.getCurrentUser(request);
     return !!user;
   },
+  
+  /**
+   * Renew Jwt with Refresh Token
+   * @param user
+   */
+  async renewSession(request: Request, user: User): Promise<User | null> {
+    try {
+      if (!user) {
+        throw new Error(Auth.NO_USER_JWT);
+      }
+
+      // Renew if the browser is same!
+      if(request.headers.get("user-agent") != user.user_agent) {
+        throw new Error(Auth.SESSION_USER_AGENT_MISMATCHES);
+      }
+      console.log(JSON.stringify(user));
+      const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_RENEW_SESSION}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Email: user.email,
+          Jwt: user.jwt,
+          RefreshToken: user.refresh_token,
+          RefreshTokenExpiry: user.refresh_token_expiry,
+          Id: user.id,
+        })
+      });
+
+      logger.debug("Session Renew response status:", { status: response.status });
+      logger.debug(response.ok);
+
+      if (!response.ok) {
+        // Handle authentication failure
+        const errorText = await response.text();
+        logger.info(Auth.SESSION_RENEWAL_FAILED, { errorText });
+
+        if (response.status === 401) {
+          logger.warn(Auth.SESSION_RENEWAL_EXPIRED, user.email);
+          throw new Error(Auth.SESSION_RENEWAL_EXPIRED);
+        }
+
+        throw new Error(Auth.SESSION_RENEWAL_FAILED);
+      }
+
+      const data = await response.json();
+      logger.debug(Auth.SESSION_RENEWAL_SUCCESS, { data });
+
+      if (!data.email || !data.jwt || !data.id) {
+        logger.error(Auth.FAILED_NO_USER, { data });
+        throw new Error(Auth.FAILED_NO_USER);
+      }
+
+      const decoded: any = jwt.decode(data.jwt);
+      logger.debug("Decoded JWT payload:", decoded);
+
+      const user_data: User = { 
+        email: data.email, 
+        jwt: data.jwt, 
+        jwt_expiry: decoded.exp,
+        refresh_token: data.refresh_token,
+        refresh_token_expiry: data.refresh_token_expiry,
+        user_agent: request.headers.get("user-agent"),
+        id: data.id };
+
+      return user_data;
+
+      
+    } catch (error) {
+      logger.error(Auth.SESSION_RENEWAL_ERROR, { error });
+      return null;
+    }
+  }
 };

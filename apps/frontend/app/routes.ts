@@ -10,6 +10,7 @@ export default [
     layout("routes/auth/auth-layout.tsx", [
       route(Routes.AUTH_LOGIN_PATH, "routes/auth/login.tsx"),
       route(Routes.AUTH_LOGOUT_PATH, "routes/auth/logout.tsx"),
+      route(Routes.AUTH_SESSION_RENEWER_PATH, "routes/auth/session-renewer.tsx"),
     ]),
   ]),
 

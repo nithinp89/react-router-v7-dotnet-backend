@@ -21,6 +21,9 @@ import { AuthService } from "./services/auth/auth.server";
 import { Routes } from "./constants";
 import { Toaster } from "@/components/ui/sonner"
 import "./app.css";
+import { SessionRenewal } from "./components/auth/session-renewer";
+import type { User } from "./services/auth/types";
+import { useAuthStore } from "./stores/auth-store";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -46,7 +49,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return {
     theme: getTheme(),
-    user,
+    user: user as User | null,
   };
 }
 
@@ -87,6 +90,14 @@ export function App() {
   const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
 
+  useEffect(() => {
+    if (data?.user?.refresh_token_expiry) {
+      useAuthStore.setState({
+        refreshTokenExpiry: data.user.refresh_token_expiry
+      });
+    }
+  }, [data?.user?.refresh_token_expiry]);
+
   return (
     <html lang="en" className={clsx(theme)}>
       <head>
@@ -100,6 +111,7 @@ export function App() {
         <Outlet context={data.user} />
         <ScrollRestoration />
         <Scripts />
+        <SessionRenewal />
         <Toaster position="top-center" expand={true} duration={5000} richColors  />
       </body>
     </html>

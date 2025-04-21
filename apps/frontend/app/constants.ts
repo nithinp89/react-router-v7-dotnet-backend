@@ -25,11 +25,12 @@ export enum Routes {
   AUTH_PREFIX = '/auth',
   AUTH_LOGIN_PATH = '/login',
   AUTH_LOGOUT_PATH = '/logout',
-  AUTH_LOGIN = '/auth/login',
-  AUTH_LOGOUT = '/auth/logout',
+  AUTH_LOGIN = `${Routes.AUTH_PREFIX}${Routes.AUTH_LOGIN_PATH}`,
+  AUTH_LOGOUT = `${Routes.AUTH_PREFIX}${Routes.AUTH_LOGOUT_PATH}`,
+  AUTH_SESSION_RENEWER_PATH = '/session/renew',
+  AUTH_SESSION_RENEWER = `${Routes.AUTH_PREFIX}${Routes.AUTH_SESSION_RENEWER_PATH}`,
   DASHBOARD = '/dashboard',
 }
-
 
 /**
  * AUTH
@@ -43,6 +44,11 @@ export enum Auth {
   SUCCESS = "Authentication successful.",
   NO_USER_JWT = "No user found in session.",
   SESSION_INACTIVE = "Session is not active.",
+  SESSION_USER_AGENT_MISMATCHES = "User Agents are not matching.",
+  SESSION_RENEWAL_ERROR = "Session renewal error.",
+  SESSION_RENEWAL_FAILED = "Session renewal failed.",
+  SESSION_RENEWAL_EXPIRED = "Session renewal expired.",
+  SESSION_RENEWAL_SUCCESS = "Session renewal successful.",
   JWT_EXPIRED = "JWT has expired (exp claim).",
   JWT_NOT_VALID_YET = "JWT not valid yet (nbf claim).",
   JWT_ISSUED_IN_FUTURE = "JWT issued in the future (iat claim).",
@@ -64,6 +70,7 @@ export enum BackendApi {
   BASE_URL = 'http://localhost:52295',
   AUTH_LOGIN = '/auth/login',
   AUTH_LOGOUT = '/auth/logout',
+  AUTH_RENEW_SESSION = '/auth/renew-session',
 }
 
 

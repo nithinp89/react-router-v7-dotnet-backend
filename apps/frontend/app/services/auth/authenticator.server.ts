@@ -11,9 +11,10 @@ export const authenticator = new Authenticator<User>();
 
 // Tell the Authenticator to use the form strategy
 authenticator.use(
-    new FormStrategy(async ({ form }) => {
+    new FormStrategy(async ({ form, request }) => {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
+        const user_agent = request.headers.get("user-agent") as string;
 
         if (!email || !password) {
             throw new Error("Email and password are required");
@@ -28,6 +29,7 @@ authenticator.use(
             email: email,
             username_type: "email",
             password: password,
+            user_agent: user_agent
         });
     }),
     
