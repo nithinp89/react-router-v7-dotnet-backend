@@ -45,7 +45,9 @@ export enum Auth {
   NO_USER_JWT = "No user found in session.",
   SESSION_INACTIVE = "Session is not active.",
   SESSION_USER_AGENT_MISMATCHES = "User Agents are not matching.",
+  SESSION_RENEWAL_COMPLETED = "Session renewal completed.",
   SESSION_RENEWAL_ERROR = "Session renewal error.",
+  SESSION_RENEWAL_NO_USER_FOUND = "Session renewal error - No user found in the session.",
   SESSION_RENEWAL_FAILED = "Session renewal failed.",
   SESSION_RENEWAL_EXPIRED = "Session renewal expired.",
   SESSION_RENEWAL_SUCCESS = "Session renewal successful.",
@@ -60,6 +62,21 @@ export enum Toast {
   INFO = "info",
   SUCCESS = "success",
   WARNING = "warning",
+}
+
+export enum Headers {
+  ACCEPT = "Accept",
+  CONTENT_TYPE = "Content-Type",
+  CONTENT_TYPE_JSON = "application/json",
+  CONTENT_TYPE_TEXT = "text/plain",
+  CONTENT_TYPE_PDF = "application/pdf",
+  CONTENT_TYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  CONTENT_TYPE_CSV = "text/csv",
+  AUTHORIZATION = "Authorization",
+  SET_COOKIE = "Set-Cookie",
+  COOKIE = "Cookie",
+  X_REQUEST_ID = "X-Request-Id",
+  
 }
 
 

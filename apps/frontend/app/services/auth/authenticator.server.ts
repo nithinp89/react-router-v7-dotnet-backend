@@ -14,7 +14,7 @@ authenticator.use(
     new FormStrategy(async ({ form, request }) => {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
-        const user_agent = request.headers.get("user-agent") as string;
+        const userAgent = request.headers.get("user-agent") as string;
 
         if (!email || !password) {
             throw new Error("Email and password are required");
@@ -25,11 +25,11 @@ authenticator.use(
         // the type of this user must match the type you pass to the
         // Authenticator the strategy will automatically inherit the type if
         // you instantiate directly inside the `use` method
-        return await AuthService.loginRequest({
+        return await AuthService.loginRequest(request, {
             email: email,
-            username_type: "email",
+            usernameType: "email",
             password: password,
-            user_agent: user_agent
+            userAgent: userAgent
         });
     }),
     

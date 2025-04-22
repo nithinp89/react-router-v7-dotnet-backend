@@ -91,12 +91,12 @@ export function App() {
   const [theme] = useTheme();
 
   useEffect(() => {
-    if (data?.user?.refresh_token_expiry) {
+    if (data?.user?.refreshTokenExpiry) {
       useAuthStore.setState({
-        refreshTokenExpiry: data.user.refresh_token_expiry
+        refreshTokenExpiry: data.user.refreshTokenExpiry
       });
     }
-  }, [data?.user?.refresh_token_expiry]);
+  }, [data?.user?.refreshTokenExpiry]);
 
   return (
     <html lang="en" className={clsx(theme)}>

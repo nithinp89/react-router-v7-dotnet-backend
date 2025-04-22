@@ -1,24 +1,8 @@
-import { Form, useActionData, redirect, useNavigation } from "react-router";
-import { authenticator } from "~/services/auth/authenticator.server";
 import { sessionStorage, AuthService } from "~/services/auth/auth.server";
 import type { Route } from "./+types/login";
 import logger from "~/services/logger/logger.server";
-import { LoginForm } from "~/components/auth/login-form";
-import { Routes, Toast } from "~/constants";
-import { toast } from "sonner";
-import { useEffect } from "react";
+import { Auth } from "~/constants";
 import type { User } from "~/services/auth/types";
-
-export function meta({ }: Route.MetaArgs) {
-  return [
-    { title: "Session Renewer" },
-    { name: "description", content: "Renew the session silently with new jwt" },
-  ];
-}
-
-export async function loader({ request }: Route.LoaderArgs) {
-  return null;
-}
 
 export async function action({ request }: Route.ActionArgs) {
   const userOrResponse = await AuthService.getCurrentUserOrRedirect(request);
@@ -27,15 +11,15 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   try {
-    let user = await AuthService.renewSession(request, userOrResponse as User);
+    const user = await AuthService.renewSession(request, userOrResponse as User);
     if (!user) {
-      return null;
+      throw new Error(Auth.SESSION_RENEWAL_NO_USER_FOUND);
     }
 
-    let session = await sessionStorage.getSession(
+    const session = await sessionStorage.getSession(
       request.headers.get("cookie")
     );
-    logger.info("Session Renewed for user", { user });
+    logger.info(Auth.SESSION_RENEWAL_SUCCESS, { userId: user?.id });
 
     session.set("user", user);
 
@@ -46,15 +30,13 @@ export async function action({ request }: Route.ActionArgs) {
     headers.append("Content-Type", "application/json");
 
     // Return the user as JSON for client-side state update
-    return new Response(JSON.stringify({ refresh_token_expiry: user?.refresh_token_expiry }), {
+    return new Response(JSON.stringify({ refreshTokenExpiry: user?.refreshTokenExpiry }), {
       status: 200,
       headers: headers,
     });
+
   } catch (error) {
-    return null;
+    logger.error(Auth.SESSION_RENEWAL_FAILED, { error, userId: userOrResponse?.id });
+    return new Response(null, { status: 500 });
   }
 }
-
-// export default function SessionRenewerPage() {
-//   return null;
-// }

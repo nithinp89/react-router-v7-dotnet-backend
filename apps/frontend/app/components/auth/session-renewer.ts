@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { Routes } from "~/constants";
+import { Auth, Routes } from "~/constants";
 import { useAuthStore } from '~/stores/auth-store';
-
+import { Headers } from "~/constants";
+import { v4 as uuidv4 } from 'uuid';
 /**
  * Session Renewal Component to silently renew the jwt for active browser session
  * @param
@@ -16,29 +17,30 @@ export function SessionRenewal() {
 
     if (expiry > now) {
       const timer = setTimeout(() => {
-        try {
-          console.log('Session nenewal started:');
-          
+        try {          
           fetch(Routes.AUTH_SESSION_RENEWER, { 
             method: "POST", 
             credentials: "include",
             headers: {
-              "Accept": "application/json"
+              [Headers.ACCEPT]: Headers.CONTENT_TYPE_JSON,
+              [Headers.X_REQUEST_ID]: uuidv4(),
             }
           }).then(response => {
             if (!response.ok) {
-              throw new Error('Failed to renew session');
+              throw new Error(Auth.SESSION_RENEWAL_FAILED);
             }
             return response.json();
           }).then(data => {
-            console.log('Session renewed:', data);
-            useAuthStore.setState({
-              refreshTokenExpiry: data.refresh_token_expiry
-            });
+            console.log(Auth.SESSION_RENEWAL_COMPLETED, data);
+            if(data.refreshTokenExpiry > 0) {
+              useAuthStore.setState({
+                refreshTokenExpiry: data.refreshTokenExpiry
+              });
+            }
           });
 
         } catch (error) {
-          console.log('Session renew error:', error);
+          console.log(Auth.SESSION_RENEWAL_ERROR, error);
         }
       }, (expiry - now) * 1000);
 

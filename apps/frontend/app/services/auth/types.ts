@@ -1,20 +1,20 @@
 export type User = {
   email: string;
   jwt: string;
-  user_agent: string | null;
-  refresh_token: string;
-  refresh_token_expiry: number;
+  userAgent: string | null;
+  refreshToken: string;
+  refreshTokenExpiry: number;
   id: string;
-  jwt_expiry: number | null;
+  jwtExpiry: number | null;
   // ... other user properties
 };
 
 // Types for authentication requests and responses
 export interface LoginRequest {
   email: string;
-  username_type: string; // username or email
+  usernameType: string; // username or email
   password: string;
-  user_agent: string;
+  userAgent: string;
 }
 
 export interface AuthResponse {

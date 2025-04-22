@@ -9,7 +9,8 @@ import { BackendApi } from "~/constants";
 import { createCookieSessionStorage } from "react-router";
 import logger from "~/services/logger/logger.server";
 import { redirect } from "react-router";
-import { Auth, Routes } from "~/constants";
+import { Auth, Routes, Headers } from "~/constants";
+import { v4 as uuidv4 } from 'uuid';
 
 // Create a session storage
 export const sessionStorage = createCookieSessionStorage({
@@ -31,12 +32,13 @@ export const AuthService = {
  * @param credentials - The login credentials
  * @returns A promise with the fetch response
  */
-  async loginRequest(credentials: LoginRequest): Promise<User> {
+  async loginRequest(request: Request, credentials: LoginRequest): Promise<User> {
     try {
       const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_LOGIN}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          [Headers.CONTENT_TYPE]: Headers.CONTENT_TYPE_JSON,
+          [Headers.X_REQUEST_ID]: request.headers.get(Headers.X_REQUEST_ID) as string ?? uuidv4(),
         },
         body: JSON.stringify(credentials)
       });
@@ -71,10 +73,10 @@ export const AuthService = {
       const user: User = { 
         email: data.email, 
         jwt: data.jwt, 
-        jwt_expiry: decoded.exp,
-        refresh_token: data.refresh_token,
-        refresh_token_expiry: data.refresh_token_expiry,
-        user_agent: credentials.user_agent,
+        jwtExpiry: decoded.exp,
+        refreshToken: data.refreshToken,
+        refreshTokenExpiry: data.refreshTokenExpiry,
+        userAgent: credentials.userAgent,
         id: data.id };
 
       return user;
@@ -157,13 +159,19 @@ export const AuthService = {
       const now = Math.floor(Date.now() / 1000); // current time in seconds
 
       if (decoded.nbf && now < decoded.nbf) {
-        throw new Error(Auth.JWT_NOT_VALID_YET);
+        const err = new Error(Auth.JWT_NOT_VALID_YET) as Error & { user?: User };
+        err.user = user;
+        throw err;
       }
       if (decoded.exp && now >= decoded.exp) {
-        throw new Error(Auth.JWT_EXPIRED);
+        const err = new Error(Auth.JWT_EXPIRED) as Error & { user?: User };
+        err.user = user;
+        throw err;
       }
       if (decoded.iat && now < decoded.iat) {
-        throw new Error(Auth.JWT_ISSUED_IN_FUTURE);
+        const err = new Error(Auth.JWT_ISSUED_IN_FUTURE) as Error & { user?: User };
+        err.user = user;
+        throw err;
       }
 
       return { ...user, decodedJwt: decoded };
@@ -194,20 +202,21 @@ export const AuthService = {
       }
 
       // Renew if the browser is same!
-      if(request.headers.get("user-agent") != user.user_agent) {
+      if(request.headers.get("user-agent") != user.userAgent) {
         throw new Error(Auth.SESSION_USER_AGENT_MISMATCHES);
       }
       console.log(JSON.stringify(user));
       const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_RENEW_SESSION}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          [Headers.CONTENT_TYPE]: Headers.CONTENT_TYPE_JSON,
+          [Headers.X_REQUEST_ID]: request.headers.get(Headers.X_REQUEST_ID) as string,
         },
         body: JSON.stringify({
           Email: user.email,
           Jwt: user.jwt,
-          RefreshToken: user.refresh_token,
-          RefreshTokenExpiry: user.refresh_token_expiry,
+          RefreshToken: user.refreshToken,
+          RefreshTokenExpiry: user.refreshTokenExpiry,
           Id: user.id,
         })
       });
@@ -239,16 +248,16 @@ export const AuthService = {
       const decoded: any = jwt.decode(data.jwt);
       logger.debug("Decoded JWT payload:", decoded);
 
-      const user_data: User = { 
+      const userData: User = { 
         email: data.email, 
         jwt: data.jwt, 
-        jwt_expiry: decoded.exp,
-        refresh_token: data.refresh_token,
-        refresh_token_expiry: data.refresh_token_expiry,
-        user_agent: request.headers.get("user-agent"),
+        jwtExpiry: decoded.exp,
+        refreshToken: data.refresh_token,
+        refreshTokenExpiry: data.refresh_token_expiry,
+        userAgent: request.headers.get("user-agent"),
         id: data.id };
 
-      return user_data;
+      return userData;
 
       
     } catch (error) {
