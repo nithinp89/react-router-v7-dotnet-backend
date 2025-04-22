@@ -36,5 +36,5 @@
 - Backend connects to Database and Redis Cache
 - Authenitcation using jwt passed by Frontend
 - Backend responsible for authentication and issuing jwt
-- Microsoft identify is used in Asp .Net for authentication
+- Asp .Net Core identify is used for authentication and authorization
 
