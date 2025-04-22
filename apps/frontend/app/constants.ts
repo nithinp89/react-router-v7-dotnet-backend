@@ -25,10 +25,10 @@ export enum Routes {
   AUTH_PREFIX = '/auth',
   AUTH_LOGIN_PATH = '/login',
   AUTH_LOGOUT_PATH = '/logout',
-  AUTH_LOGIN = `${Routes.AUTH_PREFIX}${Routes.AUTH_LOGIN_PATH}`,
-  AUTH_LOGOUT = `${Routes.AUTH_PREFIX}${Routes.AUTH_LOGOUT_PATH}`,
+  AUTH_LOGIN = '/auth/login',
+  AUTH_LOGOUT = '/auth/logout',
   AUTH_SESSION_RENEWER_PATH = '/session/renew',
-  AUTH_SESSION_RENEWER = `${Routes.AUTH_PREFIX}${Routes.AUTH_SESSION_RENEWER_PATH}`,
+  AUTH_SESSION_RENEWER = 'auth/session/renew',
   DASHBOARD = '/dashboard',
 }
 
@@ -42,7 +42,8 @@ export enum Auth {
   SERVICE_UNAVAILABLE = "Authentication Service Unavailable.",
   INVALID_CREDENTIALS = "Invalid Email or Password. Please try again.",
   SUCCESS = "Authentication successful.",
-  NO_USER_JWT = "No user found in session.",
+  NO_USER = "No user found in session.",
+  NO_USER_JWT = "No user JWT found in session.",
   SESSION_INACTIVE = "Session is not active.",
   SESSION_USER_AGENT_MISMATCHES = "User Agents are not matching.",
   SESSION_RENEWAL_COMPLETED = "Session renewal completed.",

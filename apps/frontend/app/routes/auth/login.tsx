@@ -1,4 +1,4 @@
-import { Form, useActionData, redirect, useNavigation } from "react-router";
+import { useActionData, redirect, useNavigation } from "react-router";
 import { authenticator } from "~/services/auth/authenticator.server";
 import { sessionStorage, AuthService } from "~/services/auth/auth.server";
 import type { Route } from "./+types/login";
@@ -8,7 +8,7 @@ import { Routes } from "~/constants";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
-export function meta({ }: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "Login" },
     { name: "description", content: "Login to App!" },

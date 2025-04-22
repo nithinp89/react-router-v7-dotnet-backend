@@ -6,7 +6,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  redirect,
 } from "react-router";
 import { useEffect } from "react";
 import {

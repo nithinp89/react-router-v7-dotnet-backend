@@ -2,14 +2,10 @@
  * Authentication service for handling API calls to the authentication endpoints
  */
 import jwt from "jsonwebtoken";
-import type { User } from "./types";
-import type { LoginRequest } from "./types";
-import type { AuthResponse } from "./types";
-import { BackendApi } from "~/constants";
-import { createCookieSessionStorage } from "react-router";
+import type { User, LoginRequest } from "./types";
+import { createCookieSessionStorage, redirect } from "react-router";
 import logger from "~/services/logger/logger.server";
-import { redirect } from "react-router";
-import { Auth, Routes, Headers } from "~/constants";
+import { Auth, Routes, Headers, BackendApi } from "~/constants";
 import { v4 as uuidv4 } from 'uuid';
 
 // Create a session storage
@@ -148,7 +144,12 @@ export const AuthService = {
 
       logger.debug("Current user:", { user });
 
-      if (!user || !user.jwt) {
+      if (!user) {
+        logger.debug(Auth.NO_USER, { user });
+        return null;
+      }
+
+      if (!user.jwt) {
         logger.debug(Auth.NO_USER_JWT, { user });
         return null;
       }

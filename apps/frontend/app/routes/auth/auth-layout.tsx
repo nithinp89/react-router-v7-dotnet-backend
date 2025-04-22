@@ -1,5 +1,4 @@
-import { ArrowLeftIcon } from "lucide-react";
-import { Link, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
 export default function AuthLayout() {
     return (

@@ -1,7 +1,6 @@
 import { useEffect } from "react";
-import { Auth, Routes } from "~/constants";
+import { Auth, Routes, Headers } from "~/constants";
 import { useAuthStore } from '~/stores/auth-store';
-import { Headers } from "~/constants";
 import { v4 as uuidv4 } from 'uuid';
 /**
  * Session Renewal Component to silently renew the jwt for active browser session

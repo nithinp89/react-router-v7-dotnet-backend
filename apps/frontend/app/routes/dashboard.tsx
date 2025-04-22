@@ -16,7 +16,7 @@ import {
 import { AuthService } from "~/services/auth/auth.server";
 import type { Route } from "./+types/dashboard";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "Dashboard" },
     { name: "description", content: "Welcome to Dashboard!" },
