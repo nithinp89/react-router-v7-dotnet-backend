@@ -10,8 +10,62 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BackendApi.Api;
 using System.Text;
+using Serilog;
+
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true, reloadOnChange: true)
+    .Build();
+
+var logFile = $"{configuration["LogFilePath"]}log_{Environment.MachineName}_{configuration["ApplicationName"]}_.txt";
+
+string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception} {RequestBody}]{NewLine}";
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithThreadId()
+    .Enrich.WithThreadName()
+    .Enrich.WithClientIp()
+    .Enrich.WithCorrelationId()
+    .Enrich.WithCorrelationIdHeader()
+    .Enrich.WithMachineName()
+    .Enrich.WithProperty("Application", configuration["ApplicationName"])
+    .Enrich.WithProperty("Environment", environment)
+    .ReadFrom.Configuration(configuration)
+    .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception}]{NewLine}")
+    .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception}]{NewLine}")
+    .WriteTo.Sink(new S3Sink(configuration, outputTemplate))
+    .CreateBootstrapLogger();
+
+Log.Information("Starting up");
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+// HTTP Loging Config
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.All;
+    logging.RequestHeaders.Add("x-correlation-id");
+    logging.RequestHeaders.Add("X-Forwarded-For");
+    logging.RequestHeaders.Add("X-Forwarded-Proto");
+    logging.RequestHeaders.Add("X-Forwarded-Port");
+    logging.RequestHeaders.Add("X-Forwarded-Host");
+    logging.RequestHeaders.Add("X-Forwarded-Server");
+    logging.RequestHeaders.Add("X-Amzn-Trace-Id");
+    logging.RequestHeaders.Add("Upgrade-Insecure-Requests");
+    logging.RequestHeaders.Add("sec-ch-ua");
+    logging.RequestHeaders.Add("sec-ch-ua-mobile");
+
+    logging.ResponseHeaders.Add("x-correlation-id");
+    logging.ResponseHeaders.Add("Pragma");
+    logging.ResponseHeaders.Add("Cache-Control");
+    logging.ResponseHeaders.Add("max-age");
+});
+
+
 
 builder.Services.AddControllers();
 
@@ -88,6 +142,13 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
 
+// For http request context accessing
+builder.Services.AddHttpContextAccessor();
+
+// Log
+builder.Host.UseSerilog();
+
+
 var app = builder.Build();
 
 //app.UseHealthChecks("/health");
@@ -99,6 +160,13 @@ if (app.Environment.IsDevelopment())
     app.UseOpenApi();
     app.UseSwaggerUI();
 }
+
+// Log all requests and response.
+app.UseHttpLogging();
+
+// Streamlines framework logs into a single message per request, including path, method, timings, status code, and exception.
+app.UseSerilogRequestLogging();
+
 
 //app.UseExceptionHandler(options => {  });
 
