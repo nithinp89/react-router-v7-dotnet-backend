@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using BackendApi.Api;
 using System.Text;
 using Serilog;
+using Microsoft.AspNetCore.HttpLogging;
+using System.Reflection;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var configuration = new ConfigurationBuilder()
@@ -29,14 +31,14 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
     .Enrich.WithCorrelationId()
-    .Enrich.WithCorrelationIdHeader()
+    //.Enrich.WithCorrelationIdHeader()
     .Enrich.WithMachineName()
     .Enrich.WithProperty("Application", configuration["ApplicationName"])
     .Enrich.WithProperty("Environment", environment)
     .ReadFrom.Configuration(configuration)
     .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception}]{NewLine}")
     .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception}]{NewLine}")
-    .WriteTo.Sink(new S3Sink(configuration, outputTemplate))
+    //.WriteTo.Sink(new S3Sink(configuration, outputTemplate))
     .CreateBootstrapLogger();
 
 Log.Information("Starting up");

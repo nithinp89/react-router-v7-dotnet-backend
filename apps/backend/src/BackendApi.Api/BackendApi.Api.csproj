@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>81be4921-d87a-45c6-94aa-e82d075a3ecd</UserSecretsId>
@@ -12,14 +12,18 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.13" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.3.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
