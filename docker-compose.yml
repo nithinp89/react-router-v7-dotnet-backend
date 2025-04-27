@@ -7,8 +7,18 @@ services:
     environment:
       - PORT=8080
       - REDIS_HOST=redis://app-redis:6379
+      - BACKEND_API_URL=http://app-backend:8081
     ports:
       - "8080:8080" # host : container - Left open for debugging if needed in hostmachine
+    restart: unless-stopped
+
+  app-backend:
+    image: app-backend
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081" # Expose backend HTTP
     restart: unless-stopped
 
   app-redis:
@@ -28,5 +38,6 @@ services:
     ports:
       - "80:80" # Expose nginx to host, use 443 for https
     depends_on:
-      - niyax
+      - app-frontend
+      - app-backend
     restart: unless-stopped

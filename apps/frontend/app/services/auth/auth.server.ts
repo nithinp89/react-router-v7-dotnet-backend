@@ -84,6 +84,7 @@ export const AuthService = {
       }
 
       logger.error(Auth.SERVICE_UNAVAILABLE, { error });
+      logger.error(error);
       throw new Error(Auth.SERVICE_UNAVAILABLE);
     }
   },

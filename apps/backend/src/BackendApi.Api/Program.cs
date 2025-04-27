@@ -12,6 +12,7 @@ using BackendApi.Api;
 using System.Text;
 using Serilog;
 using Microsoft.AspNetCore.HttpLogging;
+using BackendApi.Api;
 using System.Reflection;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -23,15 +24,13 @@ var configuration = new ConfigurationBuilder()
 
 var logFile = $"{configuration["LogFilePath"]}log_{Environment.MachineName}_{configuration["ApplicationName"]}_.txt";
 
-string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u4}] [{Environment}] [{Application}] [{MachineName}] [{ClientIp}] [{CorrelationId}] [{SourceContext}] [{RequestPath}] [{ThreadId}] [{Message} {Exception} {RequestBody}]{NewLine}";
-
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
     .Enrich.WithCorrelationId()
-    //.Enrich.WithCorrelationIdHeader()
+    .Enrich.WithCorrelationIdHeader("x-correlation-id")
     .Enrich.WithMachineName()
     .Enrich.WithProperty("Application", configuration["ApplicationName"])
     .Enrich.WithProperty("Environment", environment)

@@ -45,17 +45,15 @@ const logger = winston.createLogger({
   ]
 });
 
-// Add console transport in non-production environments
-if (!isProduction) {
-  logger.add(new (winston.transports as any).Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.printf(({ timestamp, level, message, ...meta }) => {
-        return `${timestamp} ${level}: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
-      })
-    )
-  }));
-}
+// Add console transport in All environments
+logger.add(new (winston.transports as any).Console({
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.printf(({ timestamp, level, message, ...meta }) => {
+      return `${timestamp} ${level}: ${message} ${Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ''}`;
+    })
+  )
+}));
 
 // Export the logger instance
 export default logger;
