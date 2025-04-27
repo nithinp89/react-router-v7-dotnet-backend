@@ -8,11 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using BackendApi.Api;
 using System.Text;
 using Serilog;
 using Microsoft.AspNetCore.HttpLogging;
-using BackendApi.Api;
 using System.Reflection;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -29,8 +27,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    .Enrich.WithCorrelationId()
-    .Enrich.WithCorrelationIdHeader("x-correlation-id")
+    .Enrich.WithCorrelationId(headerName: "x-correlation-id", addValueIfHeaderAbsence: true)
     .Enrich.WithMachineName()
     .Enrich.WithProperty("Application", configuration["ApplicationName"])
     .Enrich.WithProperty("Environment", environment)
