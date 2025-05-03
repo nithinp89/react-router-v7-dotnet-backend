@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendApi.Infrastructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendApi.Core", "src\BackendApi.Core\BackendApi.Core.csproj", "{C338E27B-5ADA-4162-9453-B4310A2142B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendApi.Application", "src\BackendApi.Application\BackendApi.Application.csproj", "{5DB20048-B8F2-4C1F-AB99-1960A3208165}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendApi.Services", "src\BackendApi.Application\BackendApi.Services.csproj", "{5DB20048-B8F2-4C1F-AB99-1960A3208165}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2CEABEA4-33E5-408B-BEB5-75366EB0801D} = {2CEABEA4-33E5-408B-BEB5-75366EB0801D}
 		{C338E27B-5ADA-4162-9453-B4310A2142B2} = {C338E27B-5ADA-4162-9453-B4310A2142B2}

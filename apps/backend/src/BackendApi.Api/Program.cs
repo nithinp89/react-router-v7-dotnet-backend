@@ -1,17 +1,21 @@
-using Microsoft.AspNetCore.Identity;
-using BackendApi.Core.Common.Interfaces;
-using BackendApi.Infrastructure.Identity;
-using BackendApi.Infrastructure.Data;
+using BackendApi.Api.DTOs;
 using BackendApi.Api.Extensions;
-using NSwag;
-using Microsoft.EntityFrameworkCore;
+using BackendApi.Api.Features;
+using BackendApi.Api.Validators;
+using BackendApi.Core.Common.Interfaces;
+using BackendApi.Infrastructure.Data;
+using BackendApi.Infrastructure.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Serilog;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using NSwag;
+using Serilog;
 using System.Reflection;
+using System.Text;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var configuration = new ConfigurationBuilder()
@@ -27,7 +31,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithThreadName()
     .Enrich.WithClientIp()
-    .Enrich.WithCorrelationId(headerName: "x-correlation-id", addValueIfHeaderAbsence: true)
+    .Enrich.WithCorrelationId(headerName: "X-Correlation-Id", addValueIfHeaderAbsence: true)
     .Enrich.WithMachineName()
     .Enrich.WithProperty("Application", configuration["ApplicationName"])
     .Enrich.WithProperty("Environment", environment)
@@ -45,49 +49,48 @@ var builder = WebApplication.CreateBuilder(args);
 // HTTP Loging Config
 builder.Services.AddHttpLogging(logging =>
 {
-    logging.LoggingFields = HttpLoggingFields.All;
-    logging.RequestHeaders.Add("x-correlation-id");
-    logging.RequestHeaders.Add("X-Forwarded-For");
-    logging.RequestHeaders.Add("X-Forwarded-Proto");
-    logging.RequestHeaders.Add("X-Forwarded-Port");
-    logging.RequestHeaders.Add("X-Forwarded-Host");
-    logging.RequestHeaders.Add("X-Forwarded-Server");
-    logging.RequestHeaders.Add("X-Amzn-Trace-Id");
-    logging.RequestHeaders.Add("Upgrade-Insecure-Requests");
-    logging.RequestHeaders.Add("sec-ch-ua");
-    logging.RequestHeaders.Add("sec-ch-ua-mobile");
+  logging.LoggingFields = HttpLoggingFields.All;
+  logging.RequestHeaders.Add("x-correlation-id");
+  logging.RequestHeaders.Add("X-Forwarded-For");
+  logging.RequestHeaders.Add("X-Forwarded-Proto");
+  logging.RequestHeaders.Add("X-Forwarded-Port");
+  logging.RequestHeaders.Add("X-Forwarded-Host");
+  logging.RequestHeaders.Add("X-Forwarded-Server");
+  logging.RequestHeaders.Add("X-Amzn-Trace-Id");
+  logging.RequestHeaders.Add("Upgrade-Insecure-Requests");
+  logging.RequestHeaders.Add("sec-ch-ua");
+  logging.RequestHeaders.Add("sec-ch-ua-mobile");
 
-    logging.ResponseHeaders.Add("x-correlation-id");
-    logging.ResponseHeaders.Add("Pragma");
-    logging.ResponseHeaders.Add("Cache-Control");
-    logging.ResponseHeaders.Add("max-age");
+  logging.ResponseHeaders.Add("x-correlation-id");
+  logging.ResponseHeaders.Add("Pragma");
+  logging.ResponseHeaders.Add("Cache-Control");
+  logging.ResponseHeaders.Add("max-age");
 });
-
-
 
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApiDocument(options => {
-    options.PostProcess = document =>
+builder.Services.AddOpenApiDocument(options =>
+{
+  options.PostProcess = document =>
+  {
+    document.Info = new OpenApiInfo
     {
-        document.Info = new OpenApiInfo
-        {
-            Version = "v1",
-            Title = "Backend API",
-            Description = "Backend API Powered By Dotnet",
-            TermsOfService = "https://path-to-licence-file.com",
-            Contact = new OpenApiContact
-            {
-                Name = "Your Name",
-                Url = "https://your-company.com"
-            },
-            License = new OpenApiLicense
-            {
-                Name = "MIT License",
-                Url = "https://path-to-licence-file.com"
-            }
-        };
+      Version = "v1",
+      Title = "Backend API",
+      Description = "Backend API Powered By Dotnet",
+      TermsOfService = "https://path-to-licence-file.com",
+      Contact = new OpenApiContact
+      {
+        Name = "Your Name",
+        Url = "https://your-company.com"
+      },
+      License = new OpenApiLicense
+      {
+        Name = "MIT License",
+        Url = "https://path-to-licence-file.com"
+      }
     };
+  };
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -100,8 +103,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configure both cookie and JWT auth
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 //{
@@ -113,27 +116,27 @@ builder.Services.AddAuthentication(options =>
 //})
 .AddJwtBearer(options =>
 {
-    var key = Encoding.UTF8.GetBytes("FGwuftblrSZdxWmCE!2=JlU7OdL7BJRMKdxPUGbNa-R-WBANhSgo4G=Yx=eGVnbz0fFw0bMd6-2bH6Mp1R?35P-b!HOtbVebxTQlbA/OL1jWZ85y?HukTSKblaUMmHfnBKat!a861Y1nXAvwHkZJ?UyLQbTcDMq/s7RnVL790ZP-f5A36qLj68kHXhn-w/v7LokJsWSZik8cMjO1rjba4Cf=GJqZ2e6XpWtyKcWt8Lemu7rj/Tqc4qJ8GVWCIF-g");
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key)
-    };
+  var key = Encoding.UTF8.GetBytes("FGwuftblrSZdxWmCE!2=JlU7OdL7BJRMKdxPUGbNa-R-WBANhSgo4G=Yx=eGVnbz0fFw0bMd6-2bH6Mp1R?35P-b!HOtbVebxTQlbA/OL1jWZ85y?HukTSKblaUMmHfnBKat!a861Y1nXAvwHkZJ?UyLQbTcDMq/s7RnVL790ZP-f5A36qLj68kHXhn-w/v7LokJsWSZik8cMjO1rjba4Cf=GJqZ2e6XpWtyKcWt8Lemu7rj/Tqc4qJ8GVWCIF-g");
+  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(key)
+  };
 });
 
 // Add CORS services
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", builder =>
-    {
-        builder
-            .WithOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
-    });
+  options.AddPolicy("AllowFrontend", builder =>
+  {
+    builder
+          .WithOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost:5173")
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+          .AllowCredentials();
+  });
 });
 
 builder.Services.AddIdentityCore<ApplicationUser>()
@@ -142,6 +145,9 @@ builder.Services.AddIdentityCore<ApplicationUser>()
 
 // For http request context accessing
 builder.Services.AddHttpContextAccessor();
+
+// Register FluentValidation validators
+builder.Services.AddScoped<IValidator<GetTokenRequest>, GetTokenRequestValidator>();
 
 // Log
 builder.Host.UseSerilog();
@@ -154,9 +160,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    app.UseOpenApi();
-    app.UseSwaggerUI();
+  app.UseDeveloperExceptionPage();
+  app.UseOpenApi();
+  app.UseSwaggerUI();
 }
 
 // Log all requests and response.
@@ -176,8 +182,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
+app.RegisterAuthEndPoints();
 
-app.MapGroup("/identity").MapCustomIdentityApi<ApplicationUser>();
+//app.MapGroup("/identity").MapCustomIdentityApi<ApplicationUser>();
 
 //app.MapEndpoints();
 

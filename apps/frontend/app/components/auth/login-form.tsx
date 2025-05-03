@@ -42,7 +42,7 @@ export function LoginForm({ isLoading = false, className = '' }: LoginFormProps)
                   name="email"
                   type="text"
                   placeholder="Email"
-                  defaultValue="admin" // Pre-fill with test credentials
+                  defaultValue="admin@example.com" // Pre-fill with test credentials
                   required
                 />
               </div>
@@ -60,7 +60,7 @@ export function LoginForm({ isLoading = false, className = '' }: LoginFormProps)
                   id="password" 
                   name="password" 
                   type="password" 
-                  defaultValue="password" // Pre-fill with test credentials
+                  defaultValue="password12345#$" // Pre-fill with test credentials
                   required 
                 />
               </div>

@@ -76,7 +76,7 @@ export const Headers = {
   AUTHORIZATION: "Authorization",
   SET_COOKIE: "Set-Cookie",
   COOKIE: "Cookie",
-  X_REQUEST_ID: "X-Request-Id",
+  X_CORRELATION_ID: "X-Correlation-Id",
 } as const;
 
 
@@ -84,8 +84,8 @@ export const Headers = {
  * BACKEND API
  */
 export const BackendApi = {
-  BASE_URL: process.env.BACKEND_API_URL ?? 'http://localhost:8081',
-  AUTH_LOGIN: '/auth/login',
+  BASE_URL: process.env.BACKEND_API_URL ?? 'http://localhost:8081/api',
+  AUTH_GET_TOKEN: '/auth/get-token',
   AUTH_LOGOUT: '/auth/logout',
   AUTH_RENEW_SESSION: '/auth/renew-session',
 } as const;

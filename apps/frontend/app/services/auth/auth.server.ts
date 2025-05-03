@@ -30,11 +30,11 @@ export const AuthService = {
  */
   async loginRequest(request: Request, credentials: LoginRequest): Promise<User> {
     try {
-      const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_LOGIN}`, {
+      const response = await fetch(`${BackendApi.BASE_URL}${BackendApi.AUTH_GET_TOKEN}`, {
         method: 'POST',
         headers: {
           [Headers.CONTENT_TYPE]: Headers.CONTENT_TYPE_JSON,
-          [Headers.X_REQUEST_ID]: request.headers.get(Headers.X_REQUEST_ID) as string ?? uuidv4(),
+          [Headers.X_CORRELATION_ID]: request.headers.get(Headers.X_CORRELATION_ID) as string ?? uuidv4(),
         },
         body: JSON.stringify(credentials)
       });

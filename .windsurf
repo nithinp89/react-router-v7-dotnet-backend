@@ -33,8 +33,20 @@
 - Use React Context for state management.
 
 # Backend
+- API project contains API endpoints using Minimal API
 - Backend connects to Database and Redis Cache
 - Authenitcation using jwt passed by Frontend
 - Backend responsible for authentication and issuing jwt
 - Asp .Net Core identify is used for authentication and authorization
+- Backend services are split into different projects
+- Core project include the Domain Model like Entities, Value Objects, , Specifications, Interfaces, DTOs, etc.
+- Infrastructure project contains database, redis connection, logging, Email Services, and other external services.
+- Services project contains business logic
+- Features folder in API project contains API endpoints using Minimal API
+- DTOs folder in API project contains Data Transfer Objects
+- Validators folder in API project contains validation logic using FluentValidation
+
+
+
+
 
