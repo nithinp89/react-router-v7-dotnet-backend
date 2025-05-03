@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
@@ -139,9 +140,12 @@ builder.Services.AddCors(options =>
   });
 });
 
-builder.Services.AddIdentityCore<ApplicationUser>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
+
+// Register DummyUserCreator as a service
+builder.Services.AddScoped<BackendApi.Api.Features.Auth.DummyUserCreator>();
 
 // For http request context accessing
 builder.Services.AddHttpContextAccessor();
@@ -154,6 +158,13 @@ builder.Host.UseSerilog();
 
 
 var app = builder.Build();
+
+// Create dummy user account at startup
+using (var scope = app.Services.CreateScope())
+{
+    var dummyUserCreator = scope.ServiceProvider.GetRequiredService<BackendApi.Api.Features.Auth.DummyUserCreator>();
+    await dummyUserCreator.CreateDummyUserAsync();
+}
 
 //app.UseHealthChecks("/health");
 //app.UseHttpsRedirection();

@@ -13,6 +13,11 @@ namespace BackendApi.Infrastructure.Data
   public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : IdentityDbContext<ApplicationUser>(options), IApplicationDbContext
   {
+    /// <summary>
+    /// Gets or sets the permissions table.
+    /// </summary>
+    public DbSet<Permission> Permissions { get; set; }
+
 
     /// <summary>
     /// Configures the model and customizes Identity table names.
@@ -33,6 +38,11 @@ namespace BackendApi.Infrastructure.Data
       builder.Entity<IdentityRoleClaim<string>>(b => { b.ToTable("role_claims"); });
       builder.Entity<IdentityUserToken<string>>(b => { b.ToTable("user_tokens"); });
 
+      builder.Entity<Permission>(b =>
+      {
+        b.HasIndex(p => p.NormalizedName).IsUnique();
+      });
+      
       builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
   }

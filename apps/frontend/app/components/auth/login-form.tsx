@@ -60,7 +60,7 @@ export function LoginForm({ isLoading = false, className = '' }: LoginFormProps)
                   id="password" 
                   name="password" 
                   type="password" 
-                  defaultValue="password12345#$" // Pre-fill with test credentials
+                  defaultValue="Password123#@" // Pre-fill with test credentials
                   required 
                 />
               </div>
