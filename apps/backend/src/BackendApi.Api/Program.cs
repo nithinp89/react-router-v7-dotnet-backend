@@ -96,8 +96,8 @@ builder.Services.AddOpenApiDocument(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext")));
 
-//builder.Services.AddAuthorization();
-//builder.Services.AddAuthentication()
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
 //.AddBearerToken(IdentityConstants.BearerScheme);
 
 // Configure both cookie and JWT auth
