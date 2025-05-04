@@ -1,4 +1,4 @@
-﻿using BackendApi.Core.Common.Models;
+﻿using BackendApi.Core.Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackendApi.Infrastructure.Identity;

@@ -1,5 +1,6 @@
 using FluentValidation;
 using BackendApi.Api.DTOs;
+using BackendApi.Api.DTOs.Auth;
 
 namespace BackendApi.Api.Validators
 {

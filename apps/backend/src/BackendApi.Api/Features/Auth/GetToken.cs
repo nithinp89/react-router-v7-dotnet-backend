@@ -1,4 +1,3 @@
-using BackendApi.Api.DTOs;
 using BackendApi.Api.Validators;
 using FluentValidation;
 using FluentValidation.Results;
@@ -8,8 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using BackendApi.Infrastructure.Identity;
 using System.Linq;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using BackendApi.Api.DTOs;
+using BackendApi.Api.DTOs.Auth;
+using BackendApi.Core.Common.Interfaces;
+using BackendApi.Core.Common;
+using BackendApi.Core.Models.Identity;
 
-namespace BackendApi.Api.Features;
+namespace BackendApi.Api.Features.Auth;
 
 /// <summary>
 /// Provides authentication-related endpoint handlers for the API.
@@ -21,97 +27,71 @@ public static class AuthHandlers
     /// </summary>
     /// <param name="request">The authentication request containing user credentials.</param>
     /// <param name="validator">The validator for the authentication request.</param>
-    /// <param name="httpContext">The current HTTP context, used to access request headers such as x-correlation-id.</param>
+    /// <param name="userManager">The UserManager service for managing user accounts.</param>
+    /// <param name="signInManager">The SignInManager service for handling sign-in operations.</param>
+    /// <param name="jwtTokenService">The JWT token service for generating authentication tokens.</param>
     /// <returns>
     /// A result that can be:
     /// <see cref="Ok{GetTokenResponse}"/>,
     /// <see cref="ValidationProblem"/>, or
     /// <see cref="ProblemHttpResult"/>
     /// </returns>
-    public static async Task<Results<Ok<GetTokenResponse>, ValidationProblem, ProblemHttpResult>> GetToken(GetTokenRequest request, IValidator<GetTokenRequest> validator, HttpContext httpContext)
+    public static async Task<Results<Ok<GetTokenResponse>, ValidationProblem, ProblemHttpResult>> GetToken(
+        GetTokenRequest request,
+        IValidator<GetTokenRequest> validator,
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IJwtTokenService jwtTokenService)
     {
         await Task.CompletedTask;
 
         ValidationResult validationResult = await validator.ValidateAsync(request);
-
 
         if (!validationResult.IsValid)
         {
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
         }
 
-        // Resolve UserManager, SignInManager, and IConfiguration from DI
-        var userManager = httpContext.RequestServices.GetService(typeof(UserManager<ApplicationUser>)) as UserManager<ApplicationUser>;
-        var signInManager = httpContext.RequestServices.GetService(typeof(SignInManager<ApplicationUser>)) as SignInManager<ApplicationUser>;
-        var configuration = httpContext.RequestServices.GetService(typeof(IConfiguration)) as IConfiguration;
-
-        if (userManager == null || signInManager == null || configuration == null)
+        if (userManager == null || signInManager == null || jwtTokenService == null)
         {
-            var problemDetails = new ValidationProblemDetails()
-            {
-                Title = "Server Error",
-                Status = StatusCodes.Status500InternalServerError,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
-            };
-            return TypedResults.Problem(problemDetails);
+            return GenericProblemResponse.ServerErrorProblem();
         }
 
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
-            var problemDetails = new ValidationProblemDetails()
-            {
-                Title = "Invalid Credentials",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
-            };
-            return TypedResults.Problem(problemDetails);
+            return AuthProblemResponse.InvalidCredentialsProblem();
         }
 
         var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
         {
-            var problemDetails = new ValidationProblemDetails()
-            {
-                Title = "Invalid Credentials",
-                Status = StatusCodes.Status400BadRequest,
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
-            };
-            return TypedResults.Problem(problemDetails);
+            return AuthProblemResponse.InvalidCredentialsProblem();
         }
 
-        // JWT generation
-        var claims = new List<System.Security.Claims.Claim>
+        // Prepare claims for JWT token
+        var claims = new List<Claim>
         {
-            new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, user.Id),
-            new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.UniqueName, user.UserName ?? user.Email ?? ""),
-            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, user.Email ?? "")
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? user.Email ?? ""),
+            new Claim(ClaimTypes.Email, user.Email ?? "")
         };
         var userRoles = await userManager.GetRolesAsync(user);
-        claims.AddRange(userRoles.Select(role => new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, role)));
+        claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var key = configuration["Jwt:Key"] ?? "f02aecc8457e71afc1bdef98da64a1d0e9591c68945868afb60c2eb45ede7258";
-        var issuer = configuration["Jwt:Issuer"] ?? "MyAppAuth";
-        var audience = configuration["Jwt:Audience"] ?? "MyApp";
-        var signingKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key));
-        var creds = new Microsoft.IdentityModel.Tokens.SigningCredentials(signingKey, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256);
-        var expires = DateTime.UtcNow.AddMinutes(30);
-
-        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            expires: expires,
-            signingCredentials: creds
-        );
-        var jwt = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token);
-        var refreshToken = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64));
+        // Generate JWT token using the service
+        var tokenResult = await jwtTokenService.GenerateTokenAsync(user.Id.ToString(), claims);
+        
+        if (!tokenResult.Result.Succeeded)
+        {
+            return GenericProblemResponse.ServerErrorProblem("Failed to generate authentication token");
+        }
 
         var response = new GetTokenResponse
         {
-            Token = jwt,
-            ExpiresAt = expires,
-            RefreshToken = refreshToken,
+            Token = tokenResult.Token,
+            ExpiresAt = tokenResult.ExpiresAt,
+            RefreshToken = tokenResult.RefreshToken,
             UserId = user.Id,
             Email = user.Email ?? ""
         };

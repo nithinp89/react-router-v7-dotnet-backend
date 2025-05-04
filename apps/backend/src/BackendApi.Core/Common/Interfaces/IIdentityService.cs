@@ -1,4 +1,4 @@
-﻿using BackendApi.Core.Common.Models;
+﻿using BackendApi.Core.Models;
 
 namespace BackendApi.Core.Common.Interfaces;
 

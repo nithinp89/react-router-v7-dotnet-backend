@@ -1,10 +1,10 @@
 ﻿using BackendApi.Core.Common.Interfaces;
-using BackendApi.Core.Common.Models;
+using BackendApi.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackendApi.Infrastructure.Identity;
-
+using BackendApi.Core.Common;
 namespace BackendApi.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
@@ -36,11 +36,15 @@ public class IdentityService : IIdentityService
         {
             UserName = userName,
             Email = userName,
+            FirstName = userName, // TODO
+            LastName = userName, // TODO
+            CreatedBy = -1, // TODO: Set to the ID of the user creating this account
+            ModifiedBy = -1 // TODO: Set to the ID of the user creating this account
         };
 
         var result = await _userManager.CreateAsync(user, password);
 
-        return (result.ToApplicationResult(), user.Id);
+        return (result.ToApplicationResult(), user.Id.ToString());
     }
 
     public async Task<bool> IsInRoleAsync(string userId, string role)

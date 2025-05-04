@@ -1,4 +1,4 @@
-namespace BackendApi.Api.DTOs
+namespace BackendApi.Api.DTOs.Auth
 {
     /// <summary>
     /// Represents the response returned after a successful authentication request, containing user and token information.
@@ -8,7 +8,7 @@ namespace BackendApi.Api.DTOs
       /// <summary>
       /// Unique identifier of the authenticated user.
       /// </summary>
-      public string UserId { get; set; } = null!;
+      public int UserId { get; set; }
       /// <summary>
       /// Email address of the authenticated user.
       /// </summary>

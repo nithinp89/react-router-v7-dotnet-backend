@@ -1,4 +1,4 @@
-namespace BackendApi.Api.DTOs
+namespace BackendApi.Api.DTOs.Auth
 {
     /// <summary>
     /// Represents a request to obtain a JWT token using user credentials.

@@ -45,6 +45,7 @@
 - Features folder in API project contains API endpoints using Minimal API
 - DTOs folder in API project contains Data Transfer Objects
 - Validators folder in API project contains validation logic using FluentValidation
+- Usually, API Endpoints call the Services layer and Services layer calls the Infrastructure layer. And all corresponding interfaces are in Core project.
 
 
 

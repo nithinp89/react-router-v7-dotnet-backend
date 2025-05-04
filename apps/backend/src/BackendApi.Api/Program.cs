@@ -1,8 +1,10 @@
 using BackendApi.Api.DTOs;
+using BackendApi.Api.DTOs.Auth;
 using BackendApi.Api.Extensions;
 using BackendApi.Api.Features;
 using BackendApi.Api.Validators;
 using BackendApi.Core.Common.Interfaces;
+using BackendApi.Core.Constants;
 using BackendApi.Infrastructure.Data;
 using BackendApi.Infrastructure.Identity;
 using FluentValidation;
@@ -95,7 +97,9 @@ builder.Services.AddOpenApiDocument(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext"))
+          .EnableSensitiveDataLogging()
+          .EnableDetailedErrors());
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
@@ -140,12 +144,19 @@ builder.Services.AddCors(options =>
   });
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(ApplicationIdentityConstants.SESSION_LOGIN_PROVIDER)
     .AddApiEndpoints();
 
 // Register DummyUserCreator as a service
 builder.Services.AddScoped<BackendApi.Api.Features.Auth.DummyUserCreator>();
+
+// Register TokenStoreService for managing authentication tokens
+builder.Services.AddScoped<BackendApi.Infrastructure.Identity.TokenStoreService>();
+
+// Register JWT token service
+builder.Services.AddScoped<BackendApi.Core.Common.Interfaces.IJwtTokenService, BackendApi.Infrastructure.Identity.JwtTokenService>();
 
 // For http request context accessing
 builder.Services.AddHttpContextAccessor();

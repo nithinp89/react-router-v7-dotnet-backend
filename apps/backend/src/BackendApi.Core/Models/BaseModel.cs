@@ -1,45 +1,14 @@
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BackendApi.Core.Models;
-using BackendApi.Core.Models.Identity;
 using BackendApi.Core.Constants;
 
-namespace BackendApi.Infrastructure.Identity;
-
-/// <summary>
-/// Represents an application user with extended profile information.
-/// </summary>
-public class ApplicationUser : IdentityUser<int>, IBaseModel
+namespace BackendApi.Core.Models
 {
   /// <summary>
-  /// Gets or sets the first name of the user.
+  /// Base model for tracking creation, modification, and soft deletion metadata.
   /// </summary>
-  [Column("first_name")]
-  [Required]
-  public required string FirstName { get; set; }
-
-  /// <summary>
-  /// Gets or sets the last name of the user.
-  /// </summary>
-  [Column("last_name")]
-  [Required]
-  public required string LastName { get; set; }
-
-  /// <summary>
-  /// Gets or sets the user type identifier.
-  /// </summary>
-  [Column("user_type_id")]
-  [Required]
-  public int UserTypeId { get; set; }
-
-  /// <summary>
-  /// Gets or sets the user type associated with this user.
-  /// </summary>
-  [ForeignKey("UserTypeId")]
-  public UserTypes? UserType { get; set; }
-
+  public abstract class BaseModel : IBaseModel
+{
   /// <summary>
   /// Gets or sets whether this permission is protected from deletion.
   /// Value must be either 'Y' or 'N'.
@@ -81,4 +50,5 @@ public class ApplicationUser : IdentityUser<int>, IBaseModel
   /// </summary>
   [Column("deleted_at")]
   public DateTime? DeletedAt { get; set; }
+}
 }
