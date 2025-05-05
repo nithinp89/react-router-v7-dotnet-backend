@@ -25,6 +25,11 @@ namespace BackendApi.Infrastructure.Data
     /// </summary>
     public required DbSet<UserTypes> UserTypes { get; set; }
 
+    /// <summary>
+    /// Gets or sets the user sessions table.
+    /// </summary>
+    public required DbSet<UserSessions> UserSessions { get; set; }
+
 
     /// <summary>
     /// Configures the model and customizes Identity table names.
@@ -56,6 +61,8 @@ namespace BackendApi.Infrastructure.Data
           .StartsAt(101)
           .IncrementsBy(1);
 
+      // No sequence needed for user sessions as it uses string IDs
+
       // Rename Identity tables to snake_case
       builder.Entity<ApplicationUser>(b => { 
         b.ToTable("users"); 
@@ -76,6 +83,9 @@ namespace BackendApi.Infrastructure.Data
         b.Property(u => u.LockoutEnd).HasColumnName("lockout_end");
         b.Property(u => u.LockoutEnabled).HasColumnName("lockout_enabled");
         b.Property(u => u.AccessFailedCount).HasColumnName("access_failed_count");
+        
+        // Configure the Active property with default value
+        b.Property(u => u.Active).HasColumnName("active").HasDefaultValue(true);
       });
       builder.Entity<ApplicationRole>(b => { 
         b.ToTable("roles"); 
@@ -135,6 +145,11 @@ namespace BackendApi.Infrastructure.Data
       builder.Entity<UserTypes>(b =>
       {
         b.Property(ut => ut.Id).HasDefaultValueSql("nextval('core.user_types_id_seq')");
+      });
+      
+      builder.Entity<UserSessions>(b =>
+      {
+        b.Property(us => us.Id).HasMaxLength(50);
       });
       
       builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

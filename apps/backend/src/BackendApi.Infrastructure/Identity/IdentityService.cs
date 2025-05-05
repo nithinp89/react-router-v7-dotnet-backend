@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackendApi.Infrastructure.Identity;
 using BackendApi.Core.Common;
+using BackendApi.Core.Interfaces.Services.Identity;
+
 namespace BackendApi.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService

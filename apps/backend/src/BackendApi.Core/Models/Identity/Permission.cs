@@ -9,7 +9,7 @@ namespace BackendApi.Core.Models.Identity
   /// Represents a standard permission in the system.
   /// </summary>
   [Table("permissions")]
-  public class Permission : BaseModel
+  public class Permission : ProtectedModel
   {
     /// <summary>
     /// Gets or sets the unique identifier for the permission.

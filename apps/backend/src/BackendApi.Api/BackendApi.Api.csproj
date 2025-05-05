@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BackendApi.Core\BackendApi.Core.csproj" />
     <ProjectReference Include="..\BackendApi.Infrastructure\BackendApi.Infrastructure.csproj" />
+    <ProjectReference Include="..\BackendApi.Application\BackendApi.Application.csproj" />
   </ItemGroup>
 
 </Project>

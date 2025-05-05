@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BackendApi.Core\BackendApi.Core.csproj" />
+    <ProjectReference Include="..\BackendApi.Infrastructure\BackendApi.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

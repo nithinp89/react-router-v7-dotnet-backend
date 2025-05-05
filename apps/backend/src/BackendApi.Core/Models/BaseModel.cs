@@ -10,14 +10,6 @@ namespace BackendApi.Core.Models
   public abstract class BaseModel : IBaseModel
 {
   /// <summary>
-  /// Gets or sets whether this permission is protected from deletion.
-  /// Value must be either 'Y' or 'N'.
-  /// </summary>
-  [Column("protected")]
-  [Required]
-  public bool Protected { get; set; } = GenericContants.PROTECTED_NO;
-
-  /// <summary>
   /// The date and time when the entity was created (UTC).
   /// </summary>
   [Column("created_at")]

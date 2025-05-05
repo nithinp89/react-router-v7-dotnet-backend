@@ -1,6 +1,6 @@
-﻿using BackendApi.Core.Models;
+﻿using BackendApi.Core.Common;
 
-namespace BackendApi.Core.Common.Interfaces;
+namespace BackendApi.Core.Interfaces.Services.Identity;
 
 public interface IIdentityService
 {

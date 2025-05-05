@@ -9,7 +9,7 @@ namespace BackendApi.Core.Models.Identity
   /// Represents a user type in the system (e.g., Admin, Customer, Agent).
   /// </summary>
   [Table("user_types")]
-  public class UserTypes : BaseModel
+  public class UserTypes : ProtectedModel
   {
     /// <summary>
     /// Gets or sets the unique identifier for the user type.

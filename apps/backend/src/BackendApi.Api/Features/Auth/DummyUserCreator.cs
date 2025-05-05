@@ -55,6 +55,7 @@ namespace BackendApi.Api.Features.Auth
       var userTypes = new[]
       {
             new UserTypes { Name = "Administrator", Description = "System administrator with full access", Protected = true, CreatedBy = ApplicationIdentityConstants.DEFAULT_USER_ID, ModifiedBy = ApplicationIdentityConstants.DEFAULT_USER_ID },
+            new UserTypes { Name = "Technical", Description = "Technical user with full access", Protected = true, CreatedBy = ApplicationIdentityConstants.DEFAULT_USER_ID, ModifiedBy = ApplicationIdentityConstants.DEFAULT_USER_ID },
             new UserTypes { Name = "Agent", Description = "Support agent with access to tickets", Protected = true, CreatedBy = ApplicationIdentityConstants.DEFAULT_USER_ID, ModifiedBy = ApplicationIdentityConstants.DEFAULT_USER_ID },
             new UserTypes { Name = "Collaborator", Description = "Support collaborator with access to their tickets and can provide internal notes", Protected = true, CreatedBy = ApplicationIdentityConstants.DEFAULT_USER_ID, ModifiedBy = ApplicationIdentityConstants.DEFAULT_USER_ID },
             new UserTypes { Name = "Customer", Description = "Regular customer with limited access", Protected = true, CreatedBy = ApplicationIdentityConstants.DEFAULT_USER_ID, ModifiedBy = ApplicationIdentityConstants.DEFAULT_USER_ID },

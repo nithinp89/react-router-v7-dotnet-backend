@@ -14,6 +14,10 @@ using BackendApi.Api.DTOs.Auth;
 using BackendApi.Core.Common.Interfaces;
 using BackendApi.Core.Common;
 using BackendApi.Core.Models.Identity;
+using BackendApi.Core.Constants;
+using Microsoft.Extensions.Logging;
+using BackendApi.Application.Services.Identity;
+using BackendApi.Core.Interfaces.Services.Identity;
 
 namespace BackendApi.Api.Features.Auth;
 
@@ -30,6 +34,7 @@ public static class AuthHandlers
     /// <param name="userManager">The UserManager service for managing user accounts.</param>
     /// <param name="signInManager">The SignInManager service for handling sign-in operations.</param>
     /// <param name="jwtTokenService">The JWT token service for generating authentication tokens.</param>
+    /// <param name="logger">The logger for recording authentication-related information.</param>
     /// <returns>
     /// A result that can be:
     /// <see cref="Ok{GetTokenResponse}"/>,
@@ -41,7 +46,8 @@ public static class AuthHandlers
         IValidator<GetTokenRequest> validator,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IJwtTokenService jwtTokenService)
+        IJwtTokenService jwtTokenService,
+        ILogger<GetTokenRequest> logger)
     {
         await Task.CompletedTask;
 
@@ -62,6 +68,11 @@ public static class AuthHandlers
         {
             return AuthProblemResponse.InvalidCredentialsProblem();
         }
+        logger.LogInformation("User found: {User}", user.UserType?.Name);
+        if(user.UserType?.Name == ApplicationIdentityConstants.USER_TYPE_TECHNICAL)
+        {
+          return AuthProblemResponse.InvalidCredentialsProblem();
+        }
 
         var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
@@ -80,7 +91,7 @@ public static class AuthHandlers
         claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         // Generate JWT token using the service
-        var tokenResult = await jwtTokenService.GenerateTokenAsync(user.Id.ToString(), claims);
+        var tokenResult = await jwtTokenService.GenerateTokensAsync(user.Id.ToString(), claims);
         
         if (!tokenResult.Result.Succeeded)
         {

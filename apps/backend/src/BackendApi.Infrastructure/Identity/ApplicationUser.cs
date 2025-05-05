@@ -81,4 +81,12 @@ public class ApplicationUser : IdentityUser<int>, IBaseModel
   /// </summary>
   [Column("deleted_at")]
   public DateTime? DeletedAt { get; set; }
+
+  /// <summary>
+  /// Gets or sets whether the user account is active.
+  /// Active accounts can log in and access the system.
+  /// </summary>
+  [Column("active")]
+  [Required]
+  public bool Active { get; set; } = true;
 }

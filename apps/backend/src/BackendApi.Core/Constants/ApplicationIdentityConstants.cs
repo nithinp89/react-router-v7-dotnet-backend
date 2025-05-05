@@ -31,5 +31,30 @@ namespace BackendApi.Core.Constants
         /// The key name used for storing session information.
         /// </summary>
         public const string SESSION_KEY_NAME = "_Session_Core";
+
+        /// <summary>
+        /// User type for system administrators with full access to the system.
+        /// </summary>
+        public const string USER_TYPE_ADMINISTRATOR = "Administrator";
+
+        /// <summary>
+        /// User type for technical operations and not allowed to login.
+        /// </summary>
+        public const string USER_TYPE_TECHNICAL = "Technical";
+
+        /// <summary>
+        /// User type for agents who handle customer requests and provide support.
+        /// </summary>
+        public const string USER_TYPE_AGENT = "Agent";
+
+        /// <summary>
+        /// User type for customers who use the system's services.
+        /// </summary>
+        public const string USER_TYPE_CUSTOMER = "Customer";
+
+        /// <summary>
+        /// User type for external collaborators who work with the system on specific projects.
+        /// </summary>
+        public const string USER_TYPE_COLLABORATOR = "Collaborator";
     }
 }

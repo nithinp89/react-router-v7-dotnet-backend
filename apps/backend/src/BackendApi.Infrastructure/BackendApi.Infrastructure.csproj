@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Data\User\" />
     <Folder Include="Email\" />
     <Folder Include="External\" />
     <Folder Include="Files\" />

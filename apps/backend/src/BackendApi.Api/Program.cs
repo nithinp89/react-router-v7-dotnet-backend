@@ -19,6 +19,8 @@ using NSwag;
 using Serilog;
 using System.Reflection;
 using System.Text;
+using BackendApi.Application.Services.Identity;
+using BackendApi.Core.Interfaces.Services.Identity;
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var configuration = new ConfigurationBuilder()
@@ -153,10 +155,10 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 builder.Services.AddScoped<BackendApi.Api.Features.Auth.DummyUserCreator>();
 
 // Register TokenStoreService for managing authentication tokens
-builder.Services.AddScoped<BackendApi.Infrastructure.Identity.TokenStoreService>();
+builder.Services.AddScoped<ITokenStoreService, TokenStoreService>();
 
 // Register JWT token service
-builder.Services.AddScoped<BackendApi.Core.Common.Interfaces.IJwtTokenService, BackendApi.Infrastructure.Identity.JwtTokenService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 // For http request context accessing
 builder.Services.AddHttpContextAccessor();
