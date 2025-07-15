@@ -58,22 +58,22 @@ export const AuthService = {
       const data = await response.json();
       logger.debug(Auth.SUCCESS, { data });
 
-      if (!data.email || !data.jwt || !data.id) {
+      if (!data.email || !data.token || !data.userId) {
         logger.error(Auth.FAILED_NO_USER, { data });
         throw new Error(Auth.FAILED_NO_USER);
       }
 
-      const decoded: any = jwt.decode(data.jwt);
+      const decoded: any = jwt.decode(data.token);
       logger.debug("Decoded JWT payload:", decoded);
 
       const user: User = { 
         email: data.email, 
-        jwt: data.jwt, 
+        jwt: data.token, 
         jwtExpiry: decoded.exp,
         refreshToken: data.refreshToken,
         refreshTokenExpiry: data.refreshTokenExpiry,
         userAgent: credentials.userAgent,
-        id: data.id };
+        id: data.userId };
 
       return user;
 

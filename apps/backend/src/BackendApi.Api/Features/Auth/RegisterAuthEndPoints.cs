@@ -21,9 +21,10 @@ public static class AuthEndPoints
   public static void RegisterAuthEndPoints(this WebApplication app)
   {
 
-    var auth = app.MapGroup("/api/auth");
+    var auth = app.MapGroup("/auth");
 
-    auth.MapPost("/get-token", AuthHandlers.GetToken);
+    auth.MapPost("/get-token", AuthHandlers.GetToken)
+        .WithTags("Auth");
   }
 
 

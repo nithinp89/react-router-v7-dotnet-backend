@@ -98,6 +98,8 @@ builder.Services.AddOpenApiDocument(options =>
   };
 });
 
+builder.Services.AddOpenApi(); // Document name is v1
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbContext"))
           .EnableSensitiveDataLogging()
@@ -185,7 +187,15 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
   app.UseDeveloperExceptionPage();
-  app.UseOpenApi();
+  app.MapOpenApi();
+  app.UseOpenApi(settings =>
+  {
+      settings.PostProcess = (document, request) =>
+      {
+          document.Servers.Clear();
+          document.Servers.Add(new NSwag.OpenApiServer { Url = "/api" });
+      };
+  });
   app.UseSwaggerUI();
 }
 
@@ -198,6 +208,8 @@ app.UseSerilogRequestLogging();
 
 //app.UseExceptionHandler(options => {  });
 
+app.UsePathBase("/api");
+
 // Use CORS before authentication
 app.UseCors("AllowFrontend");
 
@@ -207,10 +219,6 @@ app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
 app.RegisterAuthEndPoints();
-
-//app.MapGroup("/identity").MapCustomIdentityApi<ApplicationUser>();
-
-//app.MapEndpoints();
 
 //TestCases.Run();
 

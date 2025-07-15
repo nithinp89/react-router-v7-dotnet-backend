@@ -17,21 +17,14 @@ using BackendApi.Core.Interfaces.Services.Identity;
 
 namespace BackendApi.Application.Services.Identity
 {
-    /// <summary>
-    /// Implementation of the JWT token service for generating and validating JWT tokens.
-    /// </summary>
+    /// <inheritdoc/>
     public class JwtTokenService : IJwtTokenService
     {
         private readonly JwtSettings _jwtSettings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenStoreService _tokenStoreService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JwtTokenService"/> class.
-        /// </summary>
-        /// <param name="configuration">The configuration service for accessing app settings.</param>
-        /// <param name="userManager">The user manager for managing user accounts.</param>
-        /// <param name="tokenStoreService">The token store service for managing authentication tokens.</param>
+        /// <inheritdoc/>
         public JwtTokenService(IConfiguration configuration, UserManager<ApplicationUser> userManager, ITokenStoreService tokenStoreService)
         {
             _userManager = userManager;
@@ -111,10 +104,7 @@ namespace BackendApi.Application.Services.Identity
             }
         }
 
-        /// <summary>
-        /// Generates a random refresh token.
-        /// </summary>
-        /// <returns>A base64-encoded refresh token.</returns>
+        /// <inheritdoc/>
         private static string GenerateRefreshToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));

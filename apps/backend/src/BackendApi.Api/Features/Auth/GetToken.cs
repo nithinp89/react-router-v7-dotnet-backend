@@ -68,6 +68,7 @@ public static class AuthHandlers
         {
             return AuthProblemResponse.InvalidCredentialsProblem();
         }
+        
         logger.LogInformation("User found: {User}", user.UserType?.Name);
         if(user.UserType?.Name == ApplicationIdentityConstants.USER_TYPE_TECHNICAL)
         {

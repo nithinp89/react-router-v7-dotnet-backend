@@ -46,6 +46,7 @@
 - DTOs folder in API project contains Data Transfer Objects
 - Validators folder in API project contains validation logic using FluentValidation
 - Usually, API Endpoints call the Services layer and Services layer calls the Infrastructure layer. And all corresponding interfaces are in Core project.
+- Add XML comments in all interfaces classes and methods. Use inheritdoc to inherit comments from base classes and interfaces in the concrete implementation. 
 
 
 
